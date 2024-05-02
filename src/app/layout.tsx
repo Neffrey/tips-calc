@@ -21,8 +21,8 @@ import { Toaster } from "~/components/ui/toaster";
 import DefaultColorTheme from "./_components/default-color-theme";
 
 export const metadata = {
-  title: "Neffreys Todos",
-  description: "Just a quick lil todo app",
+  title: "Tip Calculator by Neffrey",
+  description: "Lil tip calculator for the homies",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

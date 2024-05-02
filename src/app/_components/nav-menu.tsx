@@ -17,7 +17,7 @@ type NavItems = {
 
 // Nav items
 const navItems: NavItems = [
-  { title: "Tasks", href: "/" },
+  // { title: "Tasks", href: "/" },
   { title: "Users", href: "/users", authedRoles: ["ADMIN"] },
 ];
 
