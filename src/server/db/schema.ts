@@ -1,8 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import {
-  boolean,
   index,
   integer,
+  numeric,
   pgTableCreator,
   primaryKey,
   text,
@@ -44,31 +44,39 @@ export const createTable = pgTableCreator((name) => `tips_${name}`);
 export type DbUser = Prettify<
   InferSqlTable<typeof users> & {
     accounts?: Account[];
-    // tasks?: Task[];
-    comments?: Comment[];
     profilePictures?: ProfilePicture[];
+    tips?: Tip[];
+    reports?: Report[];
+    baseWages?: BaseWage[];
   }
 >;
-export const users = createTable("user", {
-  id: varchar("id", { length: 255 }).notNull().primaryKey(),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("emailVerified", {
-    mode: "date",
-  }).default(sql`CURRENT_TIMESTAMP`),
-  image: varchar("image", { length: 255 }),
-  role: text("role", { enum: USER_ROLES }).default(USER_ROLES[1]),
-  colorTheme: text("colorTheme", { enum: COLOR_THEMES }).default(
-    COLOR_THEMES[5],
-  ),
-  ldTheme: text("ldTheme", { enum: ldThemes }).default(ldThemes[1]),
-});
+export const users = createTable(
+  "user",
+  {
+    id: varchar("id", { length: 255 }).notNull().primaryKey(),
+    name: varchar("name", { length: 255 }),
+    email: varchar("email", { length: 255 }).notNull(),
+    emailVerified: timestamp("emailVerified", {
+      mode: "date",
+    }).default(sql`CURRENT_TIMESTAMP`),
+    image: varchar("image", { length: 255 }),
+    role: text("role", { enum: USER_ROLES }).default(USER_ROLES[1]),
+    colorTheme: text("colorTheme", { enum: COLOR_THEMES }).default(
+      COLOR_THEMES[5],
+    ),
+    ldTheme: text("ldTheme", { enum: ldThemes }).default(ldThemes[1]),
+  },
+  (user) => ({
+    userIndex: index("user_id_index").on(user.id),
+  }),
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
-  // tasks: many(tasks),
-  // comments: many(comments),
   profilePictures: many(profilePictures),
+  tips: many(tips),
+  reports: many(reports),
+  baseWages: many(baseWages),
 }));
 
 export type Account = Prettify<InferSqlTable<typeof accounts>>;
@@ -95,7 +103,7 @@ export const accounts = createTable(
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-    userIdIdx: index("account_userId_idx").on(account.userId),
+    userIndex: index("account_user_index").on(account.userId),
   }),
 );
 
@@ -115,7 +123,7 @@ export const sessions = createTable(
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
   (session) => ({
-    userIdIdx: index("session_userId_idx").on(session.userId),
+    userIndex: index("session_user_idx").on(session.userId),
   }),
 );
 
@@ -149,7 +157,7 @@ export const profilePictures = createTable(
       .notNull()
       .primaryKey()
       .$default(() => nanoid(12)),
-    userId: text("userId")
+    user: text("user")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     url: text("url").notNull(),
@@ -158,152 +166,103 @@ export const profilePictures = createTable(
     }).default(sql`CURRENT_TIMESTAMP`),
   },
   (profilePicture) => ({
-    userIdIdx: index("userId_Idx").on(profilePicture.userId),
-    idIndex: index("id_Idx").on(profilePicture.id),
+    userIndex: index("pp_userId_Index").on(profilePicture.user),
+    idIndex: index("pp_id_Index").on(profilePicture.id),
   }),
 );
 
 export const profilePictureRelations = relations(
   profilePictures,
   ({ one }) => ({
-    userId: one(users, {
-      fields: [profilePictures.userId],
+    user: one(users, {
+      fields: [profilePictures.user],
       references: [users.id],
     }),
   }),
 );
 
-// export type Task = Prettify<
-//   InferSqlTable<typeof tasks> & {
-//     comments?: Partial<Comment>[];
-//     taskCompletions?: TaskCompletion[];
-//   }
-// >;
-// export const tasks = createTable(
-//   "task",
-//   {
-//     id: text("id")
-//       .notNull()
-//       .primaryKey()
-//       .$default(() => nanoid(12)),
-//     title: text("title").notNull(),
-//     userId: text("user")
-//       .notNull()
-//       .references(() => users.id, { onDelete: "cascade" }),
-//     timesToComplete: integer("timesToComplete").default(1).notNull(),
-//     timeframe: text("timeframe", { enum: TASK_TIMEFRAMES })
-//       .default(TASK_TIMEFRAMES[0])
-//       .notNull(),
-//     createdAt: timestamp("createdAt", {
-//       mode: "date",
-//     })
-//       .notNull()
-//       .default(sql`CURRENT_TIMESTAMP`),
-//     updatedAt: timestamp("updatedAt", {
-//       mode: "date",
-//     })
-//       .notNull()
-//       .default(sql`CURRENT_TIMESTAMP`),
-//   },
-//   (task) => ({
-//     createdByIdIdx: index("createdById_idx").on(task.userId),
-//     nameIndex: index("name_idx").on(task.title),
-//   }),
-// );
+export type BaseWage = Prettify<InferSqlTable<typeof baseWages>>;
+export const baseWages = createTable(
+  "baseWage",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$default(() => nanoid(12)),
+    user: text("user")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    amount: numeric("amount").notNull(),
+    startDate: timestamp("startDate", {
+      mode: "date",
+    }).notNull(),
+  },
+  (baseWage) => ({
+    idIndex: index("wage_id_index").on(baseWage.id),
+    userIndex: index("wage_user_index").on(baseWage.user),
+    effectiveAtIndex: index("wage_effective_at_index").on(baseWage.startDate),
+  }),
+);
 
-// export const tasksRelations = relations(tasks, ({ one, many }) => ({
-//   userId: one(users, { fields: [tasks.userId], references: [users.id] }),
-//   taskCompletions: many(taskCompletions),
-//   comments: many(comments),
-// }));
+export const baseWagesRelations = relations(baseWages, ({ one }) => ({
+  user: one(users, { fields: [baseWages.user], references: [users.id] }),
+}));
 
-// export type TaskCompletion = Prettify<
-//   InferSqlTable<typeof taskCompletions> & {
-//     task?: Partial<Task>[];
-//     user?: Partial<DbUser>[];
-//   }
-// >;
-// export const taskCompletions = createTable(
-//   "taskCompletion",
-//   {
-//     id: text("id")
-//       .notNull()
-//       .primaryKey()
-//       .$default(() => nanoid(12)),
-//     taskId: text("taskId")
-//       .notNull()
-//       .references(() => tasks.id, { onDelete: "cascade" }),
-//     userId: text("user")
-//       .notNull()
-//       .references(() => users.id, { onDelete: "cascade" }),
-//     timeframeCompletion: boolean("timeframeCompletion")
-//       .default(false)
-//       .notNull(),
-//     createdAt: timestamp("createdAt", {
-//       mode: "date",
-//     })
-//       .default(sql`CURRENT_TIMESTAMP`)
-//       .notNull(),
-//     updatedAt: timestamp("updatedAt", {
-//       mode: "date",
-//     })
-//       .default(sql`CURRENT_TIMESTAMP`)
-//       .notNull(),
-//   },
-//   (taskCompletion) => ({
-//     tcompIdIdx: index("tcompId_idx").on(taskCompletion.id),
-//   }),
-// );
+export type Tip = Prettify<InferSqlTable<typeof tips>>;
+export const tips = createTable(
+  "tip",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$default(() => nanoid(12)),
+    user: text("user")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    date: timestamp("date", {
+      mode: "date",
+    }).notNull(),
+    hours: numeric("hours").notNull(),
+    amount: numeric("amount").notNull(),
+    cashDrawerStart: numeric("cashDrawerStart"),
+    cashDrawerEnd: numeric("cashDrawerEnd"),
+  },
+  (tip) => ({
+    tipIdIndex: index("tip_id_index").on(tip.id),
+    userIndex: index("tip_user_index").on(tip.user),
+  }),
+);
 
-// export const tcRelations = relations(taskCompletions, ({ one }) => ({
-//   task: one(tasks, {
-//     fields: [taskCompletions.taskId],
-//     references: [tasks.id],
-//   }),
-//   userId: one(users, {
-//     fields: [taskCompletions.userId],
-//     references: [users.id],
-//   }),
-// }));
+export const tipRelations = relations(tips, ({ one }) => ({
+  user: one(users, { fields: [tips.user], references: [users.id] }),
+}));
 
-// export type Comment = Prettify<
-//   InferSqlTable<typeof comments> & {
-//     task?: Partial<Task>[];
-//     user?: Partial<DbUser>;
-//   }
-// >;
-// export const comments = createTable(
-//   "comment",
-//   {
-//     id: text("id")
-//       .notNull()
-//       .primaryKey()
-//       .$default(() => nanoid(12)),
-//     taskId: text("taskId")
-//       .notNull()
-//       .references(() => tasks.id, { onDelete: "cascade" }),
-//     userId: text("user")
-//       .notNull()
-//       .references(() => users.id, { onDelete: "cascade" }),
-//     content: text("content").notNull(),
-//     createdAt: timestamp("createdAt", {
-//       mode: "date",
-//     }).default(sql`CURRENT_TIMESTAMP`),
-//     // .notNull(),
-//     updatedAt: timestamp("updatedAt", {
-//       mode: "date",
-//     }).default(sql`CURRENT_TIMESTAMP`),
-//     // .notNull(),
-//   },
-//   (comment) => ({
-//     taskIdIdx: index("taskId_idx").on(comment.taskId),
-//   }),
-// );
+export type Report = Prettify<InferSqlTable<typeof reports>>;
+export const reports = createTable(
+  "report",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$default(() => nanoid(12)),
+    user: text("user")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    total: numeric("total").notNull(),
+    hourly: numeric("hourly").notNull(),
+    startDate: timestamp("startDate", {
+      mode: "date",
+    }).notNull(),
+    endDate: timestamp("endDate", {
+      mode: "date",
+    }).notNull(),
+  },
+  (report) => ({
+    idIndex: index("report_id_index").on(report.id),
+    userIndex: index("report_user_index").on(report.user),
+  }),
+);
 
-// export const commentsRelations = relations(comments, ({ one }) => ({
-//   task: one(tasks, { fields: [comments.taskId], references: [tasks.id] }),
-//   user: one(users, {
-//     fields: [comments.userId],
-//     references: [users.id],
-//   }),
-// }));
+export const reportRelations = relations(reports, ({ one }) => ({
+  user: one(users, { fields: [reports.user], references: [users.id] }),
+}));

@@ -81,12 +81,6 @@ export const authOptions: NextAuthOptions = {
             : dbUser?.colorTheme
               ? dbUser.colorTheme
               : null,
-
-          showCompletedTasksDefault: session?.user?.showCompletedTasksDefault
-            ? session.user.showCompletedTasksDefault
-            : dbUser?.showCompletedTasksDefault
-              ? dbUser.showCompletedTasksDefault
-              : null,
         },
       };
     },
