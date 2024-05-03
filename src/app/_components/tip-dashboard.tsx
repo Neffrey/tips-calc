@@ -19,7 +19,7 @@ const TipDashboard = ({ className = "" }: TipDashboardProps) => {
   const currentDate = useTimeStore((state) => state.currentDate);
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
+    <div className={cn("flex flex-col justify-start gap-4", className)}>
       <h2 className="center text-2xl font-bold uppercase tracking-widest">
         Tips
       </h2>
@@ -47,7 +47,7 @@ const TipDashboard = ({ className = "" }: TipDashboardProps) => {
             "border-solid border-2 border-white bg-transparent text-foreground",
         }}
       />
-      <h3 className="w-full grow text-center font-semibold uppercase tracking-wider">
+      <h3 className="w-full text-center font-semibold uppercase tracking-wider">
         Current Time
       </h3>
       <CurrentTimeDate />

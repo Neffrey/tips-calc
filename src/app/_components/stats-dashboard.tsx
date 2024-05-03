@@ -1,6 +1,5 @@
-// LIBS
-
-import StatCard from "./stat-card";
+// COMPONENTS
+import StatCard from "~/components/ui/stat-card";
 
 // CONSTS
 const STAT_CARDS = [
