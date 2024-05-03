@@ -5,9 +5,9 @@ import { useSession } from "next-auth/react";
 
 // COMPONENTS
 import ProtectedContent from "~/components/protectedContent";
-import { Button } from "~/components/ui/button";
-import StatsDashboard from "./_components/stats-dashboard";
 import TipDashboard from "./_components/tip-dashboard";
+import { Button } from "~/components/ui/button";
+import ReportDashboard from "../_components/stats-dashboard";
 
 const Home = () => {
   const { data: session } = useSession();
@@ -40,7 +40,7 @@ const Home = () => {
           )}
         </h1>
         <TipDashboard />
-        <StatsDashboard />
+        <ReportDashboard />
       </ProtectedContent>
     </div>
   );
