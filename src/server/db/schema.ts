@@ -233,8 +233,9 @@ export const tips = createTable(
   }),
 );
 
-export const tipRelations = relations(tips, ({ one }) => ({
+export const tipRelations = relations(tips, ({ one, many }) => ({
   user: one(users, { fields: [tips.user], references: [users.id] }),
+  tipsToReports: many(tipsToReports),
 }));
 
 export type Report = Prettify<InferSqlTable<typeof reports>>;
@@ -263,6 +264,28 @@ export const reports = createTable(
   }),
 );
 
-export const reportRelations = relations(reports, ({ one }) => ({
+export const reportRelations = relations(reports, ({ one, many }) => ({
   user: one(users, { fields: [reports.user], references: [users.id] }),
+  tipsToReports: many(tipsToReports),
+}));
+
+export const tipsToReports = createTable(
+  "tipToReport",
+  {
+    tipId: text("tipId").notNull(),
+    reportId: text("reportId").notNull(),
+  },
+  (tipToReport) => ({
+    compoundKey: primaryKey({
+      columns: [tipToReport.tipId, tipToReport.reportId],
+    }),
+  }),
+);
+
+export const tipsToReportsRelations = relations(tipsToReports, ({ one }) => ({
+  tip: one(tips, { fields: [tipsToReports.tipId], references: [tips.id] }),
+  report: one(reports, {
+    fields: [tipsToReports.reportId],
+    references: [reports.id],
+  }),
 }));
