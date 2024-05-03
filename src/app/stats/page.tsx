@@ -3,13 +3,12 @@
 //LIBS
 import { useSession } from "next-auth/react";
 
-// COMPONENTS
-import ProtectedContent from "~/components/protectedContent";
-import TipDashboard from "./_components/tip-dashboard";
 import { Button } from "~/components/ui/button";
-import ReportDashboard from "../_components/stats-dashboard";
+import ProtectedContent from "~/components/protectedContent";
 
-const Home = () => {
+// COMPONENTS
+
+const StatsPage = () => {
   const { data: session } = useSession();
 
   return (
@@ -39,11 +38,9 @@ const Home = () => {
             "friend"
           )}
         </h1>
-        <TipDashboard />
-        <ReportDashboard />
       </ProtectedContent>
     </div>
   );
 };
 
-export default Home;
+export default StatsPage;
