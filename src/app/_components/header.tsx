@@ -9,29 +9,31 @@ import NeffreyLogo from "~/components/svgs/NeffreyLogo";
 // COMP
 const Header = () => {
   return (
-    <StickyScrollBar>
-      <Link
-        // Logo & Name Container
-        className="flex h-full items-center justify-start gap-6"
-        href="/"
-      >
-        <div
-          // Logo Container
-          className="h-12 w-12 cursor-pointer fill-primary-foreground"
+    <>
+      <StickyScrollBar>
+        <Link
+          // Logo & Name Container
+          className="flex h-full items-center justify-start gap-6"
+          href="/"
         >
-          <NeffreyLogo />
-        </div>
-        <h1 className="text-lg font-semibold text-primary-foreground sm:text-xl md:text-2xl lg:text-4xl">
-          nTips
-        </h1>
-        <div className="flex h-full flex-col justify-end">
+          <div
+            // Logo Container
+            className="h-12 w-12 cursor-pointer fill-primary-foreground"
+          >
+            <NeffreyLogo />
+          </div>
+          <h1 className="text-lg font-semibold text-primary-foreground sm:text-xl md:text-2xl lg:text-4xl">
+            nTips
+          </h1>
+          {/* <div className="flex h-full flex-col justify-end">
           <h2 className="text-center text-lg tracking-wider text-foreground">
             Tip calculator for the homies
           </h2>
-        </div>
-      </Link>
-      <NavMenu />
-    </StickyScrollBar>
+        </div> */}
+        </Link>
+        <NavMenu />
+      </StickyScrollBar>
+    </>
   );
 };
 

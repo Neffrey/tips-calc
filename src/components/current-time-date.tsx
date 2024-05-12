@@ -69,3 +69,35 @@ export const CurrentWeekday = () => {
 
   return <div>{getWeekday(currentDate)}</div>;
 };
+
+export const useCurrentTime = () => {
+  const currentTime = useTimeStore((state) => state.currentTime);
+  const setCurrentTime = useTimeStore((state) => state.setCurrentTime);
+  const msUntilNextMinute = useTimeStore((state) => state.msUntilNextMinute);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime();
+    }, msUntilNextMinute);
+
+    return () => clearInterval(interval);
+  }, [msUntilNextMinute, setCurrentTime]);
+
+  return currentTime;
+};
+
+export const useCurrentDate = () => {
+  const currentDate = useTimeStore((state) => state.currentDate);
+  const setCurrentDate = useTimeStore((state) => state.setCurrentDate);
+  const msUntilNextDate = useTimeStore((state) => state.msUntilNextDate);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDate();
+    }, msUntilNextDate);
+
+    return () => clearInterval(interval);
+  }, [msUntilNextDate, setCurrentDate]);
+
+  return currentDate;
+};

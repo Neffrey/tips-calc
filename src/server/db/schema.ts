@@ -3,6 +3,7 @@ import {
   index,
   integer,
   numeric,
+  pgEnum,
   pgTableCreator,
   primaryKey,
   text,
@@ -238,6 +239,13 @@ export const tipRelations = relations(tips, ({ one, many }) => ({
   tipsToReports: many(tipsToReports),
 }));
 
+export const REPORT_TYPES_ENUM = pgEnum("popularity", [
+  "DAY",
+  "WEEK",
+  "MONTH",
+  "YEAR",
+]);
+
 export type Report = Prettify<InferSqlTable<typeof reports>>;
 export const reports = createTable(
   "report",
@@ -249,6 +257,7 @@ export const reports = createTable(
     user: text("user")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    type: REPORT_TYPES_ENUM("type").default(REPORT_TYPES_ENUM.enumValues[0]),
     total: numeric("total").notNull(),
     hourly: numeric("hourly").notNull(),
     startDate: timestamp("startDate", {

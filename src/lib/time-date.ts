@@ -68,3 +68,12 @@ export const getMonth = (date: Date): string => {
       return "Month Error";
   }
 };
+
+export const getDaysAgo = (oldDate: Date, newDate = new Date()) => {
+  const diff = newDate.getTime() - oldDate.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 0) return "Future Date";
+  return `${days} days ago`;
+};

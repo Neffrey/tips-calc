@@ -1,11 +1,15 @@
 "use client";
 
+//LIBS
+
 // COMPONENTS
 import ProtectedContent from "~/components/protectedContent";
 import NotLoggedIn from "~/components/not-logged-in";
-import OverviewRedirect from "~/components/overview-redirect";
+import DayCalender from "../day/_components/day-calendar";
 
-const Home = () => {
+// COMPONENTS
+
+const OverviewPage = () => {
   return (
     <div
       // HERO ROW
@@ -15,10 +19,10 @@ const Home = () => {
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<NotLoggedIn />}
       >
-        <OverviewRedirect />
+        <DayCalender />
       </ProtectedContent>
     </div>
   );
 };
 
-export default Home;
+export default OverviewPage;

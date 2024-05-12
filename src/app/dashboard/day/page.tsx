@@ -3,9 +3,11 @@
 // COMPONENTS
 import ProtectedContent from "~/components/protectedContent";
 import NotLoggedIn from "~/components/not-logged-in";
-import OverviewRedirect from "~/components/overview-redirect";
+import DayCalender from "./_components/day-calendar";
+import DayView from "./_components/day-view";
+import DayPrevNext from "./_components/day-prev-next";
 
-const Home = () => {
+const DayPage = () => {
   return (
     <div
       // HERO ROW
@@ -15,10 +17,17 @@ const Home = () => {
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<NotLoggedIn />}
       >
-        <OverviewRedirect />
+        <h1 className="center w-full text-center text-3xl font-bold uppercase tracking-widest">
+          Day Tracker
+        </h1>
+        <div className="flex w-full justify-center">
+          <DayPrevNext />
+        </div>
+        <DayCalender />
+        <DayView />
       </ProtectedContent>
     </div>
   );
 };
 
-export default Home;
+export default DayPage;

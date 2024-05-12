@@ -7,8 +7,9 @@ import { Button } from "~/components/ui/button";
 import ProtectedContent from "~/components/protectedContent";
 
 // COMPONENTS
+import NotLoggedIn from "~/components/not-logged-in";
 
-const StatsPage = () => {
+const WeekPage = () => {
   const { data: session } = useSession();
 
   return (
@@ -18,11 +19,7 @@ const StatsPage = () => {
     >
       <ProtectedContent
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
-        fallback={
-          <div>
-            Login to track your tips and view stats like average $ per hour
-          </div>
-        }
+        fallback={<NotLoggedIn />}
       >
         <h1 className="w-full grow text-center text-4xl font-semibold">
           Welcome
@@ -43,4 +40,4 @@ const StatsPage = () => {
   );
 };
 
-export default StatsPage;
+export default WeekPage;

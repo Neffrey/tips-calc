@@ -1,15 +1,20 @@
 // LIBS
 import Link from "next/link";
 
+// HELPERS
+import { getServerAuthSession } from "~/server/auth";
+
 // COMPONENTS
 import ProtectedContent from "~/components/protectedContent";
 import { Button } from "~/components/ui/button";
 import LoginBtn from "./login-btn";
+import Items from "./nav-items";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 // TYPES
 import { type UserRole } from "~/server/db/schema";
 
-type NavItems = {
+export type NavItems = {
   title: string;
   href: string;
   authedRoles?: UserRole[] | undefined;
@@ -17,41 +22,59 @@ type NavItems = {
 
 // Nav items
 const navItems: NavItems = [
-  // { title: "Tasks", href: "/" },
+  { title: "Day", href: "/dashboard/day", authedRoles: ["ADMIN", "USER"] },
+  {
+    title: "Week",
+    href: "/dashboard/week",
+    authedRoles: ["ADMIN", "USER"],
+  },
+  {
+    title: "Month",
+    href: "/dashboard/month",
+    authedRoles: ["ADMIN", "USER"],
+  },
+  {
+    title: "Year",
+    href: "/dashboard/year",
+    authedRoles: ["ADMIN", "USER"],
+  },
   { title: "Users", href: "/users", authedRoles: ["ADMIN"] },
 ];
 
-const NavMenu = () => {
+const NavMenu = async () => {
+  const session = await getServerAuthSession();
+
   return (
     <div
       // Nav Menu
       className="flex items-center justify-start gap-6"
     >
-      {navItems.map((item) => {
-        return (
-          <ProtectedContent
-            key={`navbar-${item.title}`}
-            authedRoles={item?.authedRoles}
-          >
-            <Link href={item.href} tabIndex={-1}>
-              <Button variant={"ghost"} className="text-primary-foreground">
-                {item.title}
-              </Button>
-            </Link>
-          </ProtectedContent>
-        );
-      })}
+      <Items items={navItems} />
       <ProtectedContent
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<LoginBtn />}
       >
-        <Link href="account" tabIndex={-1}>
-          <Button variant={"ghost"} className="text-primary-foreground">
-            My Account
+        <Link
+          className="flex items-end justify-start gap-3"
+          href="account"
+          tabIndex={-1}
+        >
+          <Button variant={"link"} className="text-primary-foreground">
+            {session?.user?.name ? session.user.name : "Account"}
           </Button>
+          <Avatar>
+            <AvatarImage
+              src={session?.user?.image ? session.user.image : ""}
+              alt={`${session?.user.name} profile picture`}
+            />
+            <AvatarFallback>
+              {session?.user?.name ? session?.user?.name.slice(0, 1) : ""}
+            </AvatarFallback>
+          </Avatar>
         </Link>
       </ProtectedContent>
     </div>
   );
 };
+
 export default NavMenu;

@@ -41,6 +41,20 @@ export const tipRouter = createTRPCRouter({
         cashDrawerEnd: input?.cashDrawerEnd ? input.cashDrawerEnd : null,
       });
     }),
+  getTip: userProcedure
+    .input(
+      z.object({
+        date: z.date(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.query.tips.findFirst({
+        where: and(
+          eq(tips.user, ctx.session.user.id),
+          eq(tips.date, input.date),
+        ),
+      });
+    }),
   // createWithReturn: userProcedure
   //   .input(
   //     z.object({
