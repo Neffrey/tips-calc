@@ -3,7 +3,7 @@
 // COMPONENTS
 import ProtectedContent from "~/components/protectedContent";
 import NotLoggedIn from "~/components/not-logged-in";
-import OverviewRedirect from "~/components/overview-redirect";
+import DayRedirect from "~/components/day-redirect";
 
 const Home = () => {
   return (
@@ -15,7 +15,7 @@ const Home = () => {
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<NotLoggedIn />}
       >
-        <OverviewRedirect />
+        <DayRedirect />
       </ProtectedContent>
     </div>
   );
