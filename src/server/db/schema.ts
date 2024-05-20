@@ -4,6 +4,7 @@ import {
   integer,
   numeric,
   pgEnum,
+  date,
   pgTableCreator,
   primaryKey,
   text,
@@ -220,7 +221,7 @@ export const tips = createTable(
     user: text("user")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    date: timestamp("date", {
+    date: date("date", {
       mode: "date",
     }).notNull(),
     hours: numeric("hours").notNull(),
@@ -240,7 +241,6 @@ export const tipRelations = relations(tips, ({ one, many }) => ({
 }));
 
 export const REPORT_TYPES_ENUM = pgEnum("popularity", [
-  "DAY",
   "WEEK",
   "MONTH",
   "YEAR",
@@ -260,16 +260,11 @@ export const reports = createTable(
     type: REPORT_TYPES_ENUM("type").default(REPORT_TYPES_ENUM.enumValues[0]),
     total: numeric("total").notNull(),
     hourly: numeric("hourly").notNull(),
-    startDate: timestamp("startDate", {
-      mode: "date",
-    }).notNull(),
-    endDate: timestamp("endDate", {
-      mode: "date",
-    }).notNull(),
+    startEpochTime: numeric("startEpochTime").notNull(),
+    endEpochTime: numeric("endEpochTime").notNull(),
   },
   (report) => ({
     idIndex: index("report_id_index").on(report.id),
-    userIndex: index("report_user_index").on(report.user),
   }),
 );
 

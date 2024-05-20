@@ -38,8 +38,8 @@ export const reportRouter = createTRPCRouter({
         user: ctx.session.user.id,
         total: input.total,
         hourly: input.hourly,
-        startDate: input.startDate,
-        endDate: input.endDate,
+        startEpochTime: input.startDate.getTime().toString(),
+        endEpochTime: input.endDate.getTime().toString(),
       });
     }),
   // edit: userProcedure

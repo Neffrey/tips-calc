@@ -45,15 +45,17 @@ export const tipRouter = createTRPCRouter({
     .input(
       z.object({
         date: z.date(),
+        // date: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      return await ctx.db.query.tips.findFirst({
+      const data = await ctx.db.query.tips.findFirst({
         where: and(
           eq(tips.user, ctx.session.user.id),
           eq(tips.date, input.date),
         ),
       });
+      return data ? data : null;
     }),
   // createWithReturn: userProcedure
   //   .input(
