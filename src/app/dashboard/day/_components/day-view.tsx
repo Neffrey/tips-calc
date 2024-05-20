@@ -9,8 +9,8 @@ import useTimeStore from "~/components/stores/time-store";
 
 // COMPONENTS
 import DaySkeleton from "./day-skeleton";
-import DayViewData from "./day-view-data";
-import DayEnterTip from "./day-enter-tip";
+// import DayViewData from "./day-view-data";
+import TipView from "./tip-view";
 
 // COMP
 const DayView = () => {
@@ -33,16 +33,11 @@ const DayView = () => {
   }, [msUntilNextDate, setCurrentDate]);
 
   return (
-    <div className="flex w-1/2 flex-col gap-4">
-      {viewDatesTip.isLoading && viewDatesTip.data ? (
-        // isLoading === true
+    <div className="flex flex-col gap-4">
+      {viewDatesTip.isLoading && viewDatesTip?.data ? (
         <DaySkeleton />
-      ) : viewDatesTip.data ? (
-        // isLoading === false && data exists
-        <DayViewData data={viewDatesTip.data} />
       ) : (
-        // isLoading === false && data does not exist
-        <DayEnterTip date={currentViewDate} />
+        <TipView data={viewDatesTip.data} />
       )}
     </div>
   );
