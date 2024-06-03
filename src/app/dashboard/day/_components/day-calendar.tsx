@@ -15,8 +15,8 @@ type DayCalenderProps = {
 // COMP
 const DayCalender = ({ className = "" }: DayCalenderProps) => {
   const currentDate = useTimeStore((state) => state.currentDate);
-  const currentViewDate = useTimeStore((state) => state.currentViewDate);
-  const setCurrentViewDate = useTimeStore((state) => state.setCurrentViewDate);
+  const viewDate = useTimeStore((state) => state.viewDate);
+  const setViewDate = useTimeStore((state) => state.setViewDate);
 
   return (
     <div className={cn("flex flex-col justify-start gap-1", className)}>
@@ -24,9 +24,9 @@ const DayCalender = ({ className = "" }: DayCalenderProps) => {
         showOutsideDays
         mode="single"
         className="rounded-lg bg-card text-card-foreground"
-        selected={currentViewDate}
+        selected={viewDate}
         onSelect={(date) => {
-          if (date) setCurrentViewDate(date);
+          if (date) setViewDate(date);
         }}
         modifiers={{ todaysDate: currentDate }}
         modifiersClassNames={{

@@ -45,6 +45,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.51.4",
+    "react-icons": "^5.2.1",
     "server-only": "^0.0.1",
     "string-sanitizer": "^2.0.2",
     "superjson": "^2.2.1",

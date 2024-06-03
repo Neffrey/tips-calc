@@ -77,3 +77,37 @@ export const getDaysAgo = (oldDate: Date, newDate = new Date()) => {
   if (days < 0) return "Future Date";
   return `${days} days ago`;
 };
+
+export const getWeekEpochs = (date: Date) => {
+  const start = date;
+  start.setHours(0, 0, 0, 0);
+  start.setTime(start.getTime() - start.getDay() * 24 * 60 * 60 * 1000);
+
+  const end = date;
+  end.setHours(0, 0, 0, 0);
+  end.setTime(end.getTime() + (6 - end.getDay()) * 24 * 60 * 60 * 1000);
+  return { startEpochTime: start.getTime(), endEpochTime: end.getTime() };
+};
+
+export const getMonthEpochs = (date: Date) => {
+  const start = date;
+  start.setHours(0, 0, 0, 0);
+  start.setDate(1);
+
+  const end = date;
+  end.setHours(0, 0, 0, 0);
+  end.setMonth(end.getMonth() + 1);
+  end.setDate(1);
+  return { startEpochTime: start.getTime(), endEpochTime: end.getTime() };
+};
+
+export const getYearEpochs = (date: Date) => {
+  const start = date;
+  start.setHours(0, 0, 0, 0);
+  start.setMonth(0);
+  start.setDate(1);
+
+  const end = start;
+  end.setFullYear(end.getFullYear() + 1);
+  return { startEpochTime: start.getTime(), endEpochTime: end.getTime() };
+};

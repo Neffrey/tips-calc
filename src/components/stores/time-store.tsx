@@ -27,8 +27,8 @@ export interface TimeStoreTypes {
   msUntilNextDate: number;
   setMsUntilNextDate: () => void;
 
-  currentViewDate: Date;
-  setCurrentViewDate: (date: Date) => void;
+  viewDate: Date;
+  setViewDate: (date: Date) => void;
 }
 
 const useTimeStore = create<TimeStoreTypes>((set) => ({
@@ -67,10 +67,10 @@ const useTimeStore = create<TimeStoreTypes>((set) => ({
     }));
   },
 
-  currentViewDate: stripTime(new Date()),
-  setCurrentViewDate: (date: Date) => {
+  viewDate: stripTime(new Date()),
+  setViewDate: (date: Date) => {
     set(() => ({
-      currentViewDate: stripTime(date),
+      viewDate: stripTime(date),
     }));
   },
 }));

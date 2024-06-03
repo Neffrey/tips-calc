@@ -5,7 +5,6 @@ import ProtectedContent from "~/components/protectedContent";
 import NotLoggedIn from "~/components/not-logged-in";
 import DayCalender from "./_components/day-calendar";
 import DayView from "./_components/day-view";
-import DayPrevNext from "./_components/day-prev-next";
 
 const DayPage = () => {
   return (
@@ -20,9 +19,6 @@ const DayPage = () => {
         <h1 className="center w-full text-center text-3xl font-bold uppercase tracking-widest">
           Day Tracker
         </h1>
-        <div className="flex w-full justify-center">
-          <DayPrevNext />
-        </div>
         <DayCalender />
         <DayView />
       </ProtectedContent>

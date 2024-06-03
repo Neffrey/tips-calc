@@ -10,6 +10,7 @@ import {
   text,
   timestamp,
   varchar,
+  bigint,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 import { nanoid } from "nanoid/non-secure";
@@ -77,7 +78,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   profilePictures: many(profilePictures),
   tips: many(tips),
-  reports: many(reports),
+  // reports: many(reports),
   baseWages: many(baseWages),
 }));
 
@@ -224,72 +225,74 @@ export const tips = createTable(
     date: date("date", {
       mode: "date",
     }).notNull(),
-    hours: numeric("hours").notNull(),
-    amount: numeric("amount").notNull(),
+    // epoch: bigint("epoch", { mode: "number" }).$type<number>().notNull(),
+    hours: numeric("hours").$type<number>().notNull(),
+    amount: numeric("amount").$type<number>().notNull(),
     cashDrawerStart: numeric("cashDrawerStart"),
     cashDrawerEnd: numeric("cashDrawerEnd"),
   },
   (tip) => ({
     tipIdIndex: index("tip_id_index").on(tip.id),
     userIndex: index("tip_user_index").on(tip.user),
+    epochIndex: index("tip_epoch_index").on(tip.user),
   }),
 );
 
 export const tipRelations = relations(tips, ({ one, many }) => ({
   user: one(users, { fields: [tips.user], references: [users.id] }),
-  tipsToReports: many(tipsToReports),
+  // tipsToReports: many(tipsToReports),
 }));
 
-export const REPORT_TYPES_ENUM = pgEnum("popularity", [
-  "WEEK",
-  "MONTH",
-  "YEAR",
-]);
+// export const REPORT_TYPES_ENUM = pgEnum("popularity", [
+//   "WEEK",
+//   "MONTH",
+//   "YEAR",
+// ]);
 
-export type Report = Prettify<InferSqlTable<typeof reports>>;
-export const reports = createTable(
-  "report",
-  {
-    id: text("id")
-      .notNull()
-      .primaryKey()
-      .$default(() => nanoid(12)),
-    user: text("user")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    type: REPORT_TYPES_ENUM("type").default(REPORT_TYPES_ENUM.enumValues[0]),
-    total: numeric("total").notNull(),
-    hourly: numeric("hourly").notNull(),
-    startEpochTime: numeric("startEpochTime").notNull(),
-    endEpochTime: numeric("endEpochTime").notNull(),
-  },
-  (report) => ({
-    idIndex: index("report_id_index").on(report.id),
-  }),
-);
+// export type Report = Prettify<InferSqlTable<typeof reports>>;
+// export const reports = createTable(
+//   "report",
+//   {
+//     id: text("id")
+//       .notNull()
+//       .primaryKey()
+//       .$default(() => nanoid(12)),
+//     user: text("user")
+//       .notNull()
+//       .references(() => users.id, { onDelete: "cascade" }),
+//     type: REPORT_TYPES_ENUM("type").default(REPORT_TYPES_ENUM.enumValues[0]),
+//     // total: numeric("total").notNull(),
+//     // hourly: numeric("hourly").notNull(),
+//     startEpochTime: numeric("startEpochTime").$type<number>().notNull(),
+//     endEpochTime: numeric("endEpochTime").$type<number>().notNull(),
+//   },
+//   (report) => ({
+//     idIndex: index("report_id_index").on(report.id),
+//   }),
+// );
 
-export const reportRelations = relations(reports, ({ one, many }) => ({
-  user: one(users, { fields: [reports.user], references: [users.id] }),
-  tipsToReports: many(tipsToReports),
-}));
+// export const reportRelations = relations(reports, ({ one, many }) => ({
+//   user: one(users, { fields: [reports.user], references: [users.id] }),
+//   tipsToReports: many(tipsToReports),
+// }));
 
-export const tipsToReports = createTable(
-  "tipToReport",
-  {
-    tipId: text("tipId").notNull(),
-    reportId: text("reportId").notNull(),
-  },
-  (tipToReport) => ({
-    compoundKey: primaryKey({
-      columns: [tipToReport.tipId, tipToReport.reportId],
-    }),
-  }),
-);
+// export const tipsToReports = createTable(
+//   "tipToReport",
+//   {
+//     tipId: text("tipId").notNull(),
+//     reportId: text("reportId").notNull(),
+//   },
+//   (tipToReport) => ({
+//     compoundKey: primaryKey({
+//       columns: [tipToReport.tipId, tipToReport.reportId],
+//     }),
+//   }),
+// );
 
-export const tipsToReportsRelations = relations(tipsToReports, ({ one }) => ({
-  tip: one(tips, { fields: [tipsToReports.tipId], references: [tips.id] }),
-  report: one(reports, {
-    fields: [tipsToReports.reportId],
-    references: [reports.id],
-  }),
-}));
+// export const tipsToReportsRelations = relations(tipsToReports, ({ one }) => ({
+//   tip: one(tips, { fields: [tipsToReports.tipId], references: [tips.id] }),
+//   report: one(reports, {
+//     fields: [tipsToReports.reportId],
+//     references: [reports.id],
+//   }),
+// }));
