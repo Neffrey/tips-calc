@@ -1,19 +1,19 @@
 // LIBS
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   FaCheck,
+  FaDollarSign,
   FaExclamationCircle,
   FaRegClock,
-  FaDollarSign,
 } from "react-icons/fa";
 import { z } from "zod";
 
 // HELPERS
+import useDataStore from "~/components/stores/data-store";
 import useThemeStore from "~/components/stores/theme-store";
-import useTimeStore from "~/components/stores/time-store";
-import { getDaysAgo } from "~/lib/time-date";
+import { getDaysDifference } from "~/lib/time-date";
 import { twoDecimals } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
@@ -28,10 +28,10 @@ import {
   FormLabel,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import DayPrevNext from "./day-prev-next";
-import DaySkeleton from "./day-skeleton";
-import { cn } from "~/lib/utils";
 import { Separator } from "~/components/ui/separator";
+import { cn } from "~/lib/utils";
+import DayControlBtns from "./day-control-btns";
+import DaySkeleton from "./day-skeleton";
 
 // CONSTANTS
 export const addTipFormSchema = z.object({
@@ -54,10 +54,13 @@ const DayView = () => {
   const cashDrawer = useThemeStore((state) => state.cashDrawer);
   const setCashDrawer = useThemeStore((state) => state.setCashDrawer);
 
-  const currentDate = useTimeStore((state) => state.currentDate);
-  const viewDate = useTimeStore((state) => state.viewDate);
-  const setCurrentDate = useTimeStore((state) => state.setCurrentDate);
-  const msUntilNextDate = useTimeStore((state) => state.msUntilNextDate);
+  const currentDate = useDataStore((state) => state.currentDate);
+  const viewDate = useDataStore((state) => state.viewDate);
+  const setCurrentDate = useDataStore((state) => state.setCurrentDate);
+  const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
+  const addDayToViewMonthTippedDays = useDataStore(
+    (state) => state.addDayToViewMonthTippedDays,
+  );
 
   // QUERIES
   const viewDatesTip = api.tip.findSingle.useQuery({
@@ -67,6 +70,7 @@ const DayView = () => {
   const createTip = api.tip.create.useMutation({
     onSuccess: () => {
       void viewDatesTip.refetch();
+      addDayToViewMonthTippedDays(viewDate);
     },
   });
 
@@ -87,10 +91,10 @@ const DayView = () => {
         ? viewDatesTip.data.amount.toString()
         : "0",
       cashDrawerStart: viewDatesTip?.data?.cashDrawerStart
-        ? viewDatesTip.data.cashDrawerStart
+        ? viewDatesTip.data.cashDrawerStart.toString()
         : "0",
       cashDrawerEnd: viewDatesTip?.data?.cashDrawerEnd
-        ? viewDatesTip.data.cashDrawerEnd
+        ? viewDatesTip.data.cashDrawerEnd.toString()
         : "0",
     },
   });
@@ -109,46 +113,8 @@ const DayView = () => {
       : createTip.mutate(validatedValues);
   };
 
-  // SET FORM VALUES ON DATA CHANGE
-  useEffect(
-    () => {
-      // resetFormValues();
-
-      if (viewDatesTip.data) {
-        form.setValue("amount", viewDatesTip.data.amount.toString());
-        form.setValue("hours", viewDatesTip.data.hours.toString());
-        if (viewDatesTip.data.cashDrawerStart) {
-          form.setValue("cashDrawerStart", viewDatesTip.data.cashDrawerStart);
-        }
-        if (viewDatesTip.data.cashDrawerEnd) {
-          form.setValue("cashDrawerEnd", viewDatesTip.data.cashDrawerEnd);
-        }
-        // Show cash drawer if either start or end is not 0
-        if (
-          (viewDatesTip.data.cashDrawerStart &&
-            viewDatesTip.data.cashDrawerStart !== "0") ??
-          (viewDatesTip.data.cashDrawerEnd &&
-            viewDatesTip.data.cashDrawerEnd !== "0")
-          // TODO: Keep open if profile default is cashDrawerOpen
-        ) {
-          setCashDrawer(true);
-        } else {
-          setCashDrawer(false);
-        }
-      } else {
-        form.setValue("amount", "0");
-        form.setValue("hours", "0");
-        form.setValue("cashDrawerStart", "0");
-        form.setValue("cashDrawerEnd", "0");
-      }
-    },
-
-    // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip.data, viewDate],
-  );
-
   // Keep Current Date Updated
-  useEffect(() => {
+  useLayoutEffect(() => {
     const interval = setInterval(() => {
       setCurrentDate();
     }, msUntilNextDate);
@@ -156,15 +122,96 @@ const DayView = () => {
     return () => clearInterval(interval);
   }, [msUntilNextDate, setCurrentDate]);
 
+  // Calc UI States
+  const calcViewDatesStats = () => {
+    if (!viewDatesTip?.data) {
+      return 0;
+    }
+    return twoDecimals(
+      Number(viewDatesTip?.data?.amount ? viewDatesTip.data.amount : 0) +
+        Number(
+          viewDatesTip?.data?.cashDrawerEnd
+            ? viewDatesTip.data.cashDrawerEnd
+            : 0,
+        ) -
+        Number(
+          viewDatesTip?.data?.cashDrawerStart
+            ? viewDatesTip.data.cashDrawerStart
+            : 0,
+        ),
+    );
+  };
+
+  // UI STATES
+  const [viewDatesTotalMoney, setViewDatesTotalMoney] =
+    useState<number>(calcViewDatesStats());
+
+  // Update UI States
+  useLayoutEffect(
+    () => {
+      setViewDatesTotalMoney(calcViewDatesStats());
+    },
+    // eslint-disable-next-line -- only want dependency on data
+    [viewDatesTip.data],
+  );
+
+  // SET FORM VALUES ON DATA CHANGE
+  useEffect(
+    () => {
+      // resetFormValues();
+      if (!viewDatesTip.data) {
+        form.setValue("amount", "0");
+        form.setValue("hours", "0");
+        form.setValue("cashDrawerStart", "0");
+        form.setValue("cashDrawerEnd", "0");
+      }
+      if (viewDatesTip.data) {
+        form.setValue("amount", viewDatesTip.data.amount.toString());
+        form.setValue("hours", viewDatesTip.data.hours.toString());
+        if (viewDatesTip.data.cashDrawerStart) {
+          form.setValue(
+            "cashDrawerStart",
+            viewDatesTip.data.cashDrawerStart.toString(),
+          );
+        } else {
+          form.setValue("cashDrawerStart", "0");
+        }
+        if (viewDatesTip.data.cashDrawerEnd) {
+          form.setValue(
+            "cashDrawerEnd",
+            viewDatesTip.data.cashDrawerEnd.toString(),
+          );
+        }
+        // Show cash drawer if either start or end is not 0
+        if (
+          (viewDatesTip.data.cashDrawerStart &&
+            viewDatesTip.data.cashDrawerStart !== 0) ??
+          (viewDatesTip.data.cashDrawerEnd &&
+            viewDatesTip.data.cashDrawerEnd !== 0)
+          // TODO: Keep open if profile default is cashDrawerOpen
+        ) {
+          setCashDrawer(true);
+        } else {
+          setCashDrawer(false);
+        }
+      }
+    },
+
+    // eslint-disable-next-line -- only want dependency on data
+    [viewDatesTip.data, viewDate],
+  );
+
+  // RETURN COMPONENT
   return (
     <div className="flex flex-col gap-4">
       {viewDatesTip.isLoading && viewDatesTip?.data ? (
         <DaySkeleton />
       ) : (
-        <div className="flex w-full flex-col justify-between gap-2 rounded-lg bg-card px-3 py-4">
+        <div className="flex w-full flex-col items-center justify-between gap-2 rounded-lg bg-card px-4 py-3">
+          <DayControlBtns />
           <div
             className={cn(
-              "flex flex-wrap justify-between gap-3 rounded-lg bg-popover px-5 py-2 text-popover-foreground",
+              "flex flex-wrap justify-between gap-3 rounded-lg bg-popover px-6 py-5 text-popover-foreground",
               viewDatesTip.data ? "" : "cursor-not-allowed",
             )}
           >
@@ -176,7 +223,7 @@ const DayView = () => {
                   day: "numeric",
                 })}
               </h2>
-              <h3 className="">{getDaysAgo(viewDate, currentDate)}</h3>
+              <h3 className="">{getDaysDifference(viewDate, currentDate)}</h3>
             </div>
             <div className="flex items-center">
               {viewDatesTip.data ? "Tip Entered" : "No Tip Data"}
@@ -198,39 +245,43 @@ const DayView = () => {
               <div className="flex w-full items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <FaDollarSign />
-                  <span>
-                    {viewDatesTip.data?.amount
-                      ? twoDecimals(viewDatesTip.data.amount)
-                      : "0"}
-                  </span>
+                  <span>{viewDatesTotalMoney.toString() ?? "0"}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <FaRegClock />
                   <span>
-                    {viewDatesTip.data?.hours
-                      ? twoDecimals(viewDatesTip.data.hours)
-                      : "0"}
+                    {/* {viewDatesTotalHours
+                      ? twoDecimals(viewDatesTotalHours).toString()
+                      : "0"} */}
+                    {viewDatesTip?.data?.hours.toString() ?? "0"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span>$ per H</span>
                   <span>
-                    {viewDatesTip.data?.hours && viewDatesTip.data?.amount
+                    {viewDatesTotalMoney && viewDatesTip?.data?.hours
                       ? twoDecimals(
-                          viewDatesTip.data.amount / viewDatesTip.data.hours,
-                        )
+                          viewDatesTotalMoney / viewDatesTip?.data?.hours,
+                        ).toString()
                       : "0"}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-          <Separator className="" />
+
+          <div className="pt-4" />
+          <Separator className="w-4/5 bg-card-foreground/30" />
+
+          {/* Form Section */}
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className="flex flex-col gap-4 p-6"
+              className="flex w-full flex-col gap-4 p-6"
             >
+              <h3 className="text-lg font-bold">
+                {`${viewDatesTip.data ? "Edit Existing" : "Add"} Tip`}
+              </h3>
               <div className="flex w-full justify-between gap-3">
                 <FormField
                   control={form.control}
@@ -313,15 +364,6 @@ const DayView = () => {
               )}
 
               {/* bottom section */}
-              <div className="flex w-full justify-between gap-3">
-                {/* <div className="flex flex-col items-end justify-end p-4">
-              {viewDate.toLocaleDateString(undefined, {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}
-            </div> */}
-              </div>
               <Button
                 type="submit"
                 className="rounded-xl px-8 py-6 text-xl font-bold"
@@ -330,7 +372,6 @@ const DayView = () => {
               </Button>
             </form>
           </Form>
-          <DayPrevNext />
         </div>
       )}
     </div>

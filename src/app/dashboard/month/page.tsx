@@ -3,10 +3,11 @@
 //LIBS
 import { useSession } from "next-auth/react";
 
-import { Button } from "~/components/ui/button";
 import ProtectedContent from "~/components/protectedContent";
+import { Button } from "~/components/ui/button";
 
 // COMPONENTS
+import TipData from "~/app/_components/tip-data";
 import NotLoggedIn from "~/components/not-logged-in";
 
 const WeekPage = () => {
@@ -21,6 +22,7 @@ const WeekPage = () => {
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<NotLoggedIn />}
       >
+        <TipData />
         <h1 className="w-full grow text-center text-4xl font-semibold">
           Welcome
           {session?.user?.name ? (

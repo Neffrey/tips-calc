@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 
 // UTILS
-import useTimeStore from "~/components/stores/time-store";
+import useDataStore from "~/components/stores/data-store";
 import { getMonth, getWeekday } from "~/lib/time-date";
 
 export const CurrentTimeDate = () => {
@@ -16,9 +16,9 @@ export const CurrentTimeDate = () => {
 };
 
 export const CurrentTime = () => {
-  const currentTime = useTimeStore((state) => state.currentTime);
-  const setCurrentTime = useTimeStore((state) => state.setCurrentTime);
-  const msUntilNextMinute = useTimeStore((state) => state.msUntilNextMinute);
+  const currentTime = useDataStore((state) => state.currentTime);
+  const setCurrentTime = useDataStore((state) => state.setCurrentTime);
+  const msUntilNextMinute = useDataStore((state) => state.msUntilNextMinute);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,9 +39,9 @@ export const CurrentTime = () => {
 };
 
 export const CurrentDate = () => {
-  const currentDate = useTimeStore((state) => state.currentDate);
-  const setCurrentDate = useTimeStore((state) => state.setCurrentDate);
-  const msUntilNextDate = useTimeStore((state) => state.msUntilNextDate);
+  const currentDate = useDataStore((state) => state.currentDate);
+  const setCurrentDate = useDataStore((state) => state.setCurrentDate);
+  const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,9 +55,9 @@ export const CurrentDate = () => {
 };
 
 export const CurrentWeekday = () => {
-  const currentDate = useTimeStore((state) => state.currentDate);
-  const setCurrentDate = useTimeStore((state) => state.setCurrentDate);
-  const msUntilNextDate = useTimeStore((state) => state.msUntilNextDate);
+  const currentDate = useDataStore((state) => state.currentDate);
+  const setCurrentDate = useDataStore((state) => state.setCurrentDate);
+  const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -71,9 +71,9 @@ export const CurrentWeekday = () => {
 };
 
 export const useCurrentTime = () => {
-  const currentTime = useTimeStore((state) => state.currentTime);
-  const setCurrentTime = useTimeStore((state) => state.setCurrentTime);
-  const msUntilNextMinute = useTimeStore((state) => state.msUntilNextMinute);
+  const currentTime = useDataStore((state) => state.currentTime);
+  const setCurrentTime = useDataStore((state) => state.setCurrentTime);
+  const msUntilNextMinute = useDataStore((state) => state.msUntilNextMinute);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -87,9 +87,9 @@ export const useCurrentTime = () => {
 };
 
 export const useCurrentDate = () => {
-  const currentDate = useTimeStore((state) => state.currentDate);
-  const setCurrentDate = useTimeStore((state) => state.setCurrentDate);
-  const msUntilNextDate = useTimeStore((state) => state.msUntilNextDate);
+  const currentDate = useDataStore((state) => state.currentDate);
+  const setCurrentDate = useDataStore((state) => state.setCurrentDate);
+  const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
 
   useEffect(() => {
     const interval = setInterval(() => {

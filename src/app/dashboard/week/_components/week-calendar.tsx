@@ -3,14 +3,14 @@ import { useEffect } from "react";
 
 // UTILS
 import useDataStore from "~/components/stores/data-store";
+import useTipStore from "~/components/stores/tip-store";
 import { cn, tippedIncludes } from "~/lib/utils";
 
 // COMPONENTS
-import useTipStore from "~/components/stores/tip-store";
 import { Calendar } from "~/components/ui/calendar";
 
 // COMP
-const DayCalender = ({ className = "" }: { className?: string }) => {
+const WeekCalender = ({ className = "" }: { className?: string }) => {
   const currentDate = useDataStore((state) => state.currentDate);
   const viewDate = useDataStore((state) => state.viewDate);
   const setViewDate = useDataStore((state) => state.setViewDate);
@@ -19,6 +19,8 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
   // const viewMonthTippedDays = useDataStore(
   //   (state) => state.viewMonthTippedDays,
   // );
+  const viewWeek = useDataStore((state) => state.viewWeek);
+  const setViewWeek = useDataStore((state) => state.setViewWeek);
   const tips = useTipStore((state) => state.tips);
 
   // Keep viewMonth in sync with viewDate
@@ -50,9 +52,13 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
         onSelect={(date) => {
           if (date) {
             setViewDate(date);
+            setViewWeek(date);
           }
         }}
         modifiers={{
+          viewDate: viewDate,
+          viewWeekStart: viewWeek.start,
+          viewWeekEnd: viewWeek.end,
           todaysDate: currentDate,
           tipped:
             tips?.map((tip) => {
@@ -76,9 +82,10 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
                 : // If today is not viewDate & no tip entered
                   "bg-secondary/0 text-foreground",
           ),
-          selected: tippedIncludes({ date: viewDate, tipData: tips })
-            ? "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
-            : "bg-primary/80 text-primary-foreground",
+          selected: "bg-transparent text-primary-foreground", //border-2 border-solid
+          // selected: tippedIncludes(viewDate)
+          //   ? "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
+          //   : "bg-primary/80 text-primary-foreground",
           tipped: "bg-secondary/80 text-secondary-foreground",
         }}
       />
@@ -94,12 +101,8 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
         <div className="h-6 w-6 rounded-md border-2 border-solid border-secondary bg-secondary text-secondary-foreground" />
         Tip Entered
       </div>
-      <div className="flex w-full items-start gap-4 p-2">
-        <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground" />
-        Selected Day Has Tip
-      </div>
     </div>
   );
 };
 
-export default DayCalender;
+export default WeekCalender;

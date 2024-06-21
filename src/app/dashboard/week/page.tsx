@@ -1,16 +1,53 @@
 "use client";
 
-//LIBS
-import { useSession } from "next-auth/react";
+// LIBS
 
-import { Button } from "~/components/ui/button";
-import ProtectedContent from "~/components/protectedContent";
+// UTILS
 
 // COMPONENTS
+import TipData from "~/app/_components/tip-data";
 import NotLoggedIn from "~/components/not-logged-in";
+import ProtectedContent from "~/components/protectedContent";
+import useDataStore from "~/components/stores/data-store";
+import WeekCalender from "./_components/week-calendar";
+import WeekView from "./_components/week-view";
 
-const YearPage = () => {
-  const { data: session } = useSession();
+// TYPES
+export type TipData =
+  | {
+      id: string;
+      user: string;
+      date: Date;
+      hours: number;
+      amount: number;
+      cashDrawerStart: number | null;
+      cashDrawerEnd: number | null;
+    }[]
+  | null
+  | undefined;
+
+const WeekPage = () => {
+  const viewMonth = useDataStore((state) => state.viewMonth);
+  // const setViewMonthTippedDays = useDataStore(
+  //   (state) => state.setViewMonthTippedDays,
+  // );
+
+  // Fetch viewMonth tips
+  // const viewMonthsTips = api.tip.findWithinRange.useQuery({
+  //   startDate: findViewMonthStart(viewMonth),
+  //   endDate: findViewMonthEnd(viewMonth),
+  // });
+
+  // useLayoutEffect(
+  //   () => {
+  //     if (viewMonthsTips.data) {
+  //       setViewMonthTippedDays(viewMonthsTips.data?.map((tip) => tip.date));
+  //       setTipData(viewMonthsTips.data);
+  //     }
+  //   },
+  //   // eslint-disable-next-line -- only when viewMonthsTips.data changes
+  //   [viewMonthsTips.data],
+  // );
 
   return (
     <div
@@ -21,23 +58,19 @@ const YearPage = () => {
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<NotLoggedIn />}
       >
-        <h1 className="w-full grow text-center text-4xl font-semibold">
-          Welcome
-          {session?.user?.name ? (
-            <Button
-              variant="link"
-              className="text-4xl"
-              onClick={() => console.log("Change name")}
-            >
-              {session.user.name}
-            </Button>
-          ) : (
-            "friend"
-          )}
+        <TipData />
+        <h1 className="center w-full text-center text-3xl font-bold uppercase tracking-widest">
+          Week Tracker
         </h1>
+        <WeekCalender />
+        <WeekView />
+        {/* <div className="flex flex-col">
+          monthStart: {findViewMonthStart(viewMonth).toLocaleDateString()}
+          monthEnd: {findViewMonthEnd(viewMonth).toLocaleDateString()}
+        </div> */}
       </ProtectedContent>
     </div>
   );
 };
 
-export default YearPage;
+export default WeekPage;

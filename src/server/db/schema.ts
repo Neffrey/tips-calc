@@ -225,22 +225,20 @@ export const tips = createTable(
     date: date("date", {
       mode: "date",
     }).notNull(),
-    // epoch: bigint("epoch", { mode: "number" }).$type<number>().notNull(),
     hours: numeric("hours").$type<number>().notNull(),
     amount: numeric("amount").$type<number>().notNull(),
-    cashDrawerStart: numeric("cashDrawerStart"),
-    cashDrawerEnd: numeric("cashDrawerEnd"),
+    cashDrawerStart: numeric("cashDrawerStart").$type<number>(),
+    cashDrawerEnd: numeric("cashDrawerEnd").$type<number>(),
   },
   (tip) => ({
     tipIdIndex: index("tip_id_index").on(tip.id),
     userIndex: index("tip_user_index").on(tip.user),
-    epochIndex: index("tip_epoch_index").on(tip.user),
+    dateIndex: index("tip_date_index").on(tip.date),
   }),
 );
 
 export const tipRelations = relations(tips, ({ one, many }) => ({
   user: one(users, { fields: [tips.user], references: [users.id] }),
-  // tipsToReports: many(tipsToReports),
 }));
 
 // export const REPORT_TYPES_ENUM = pgEnum("popularity", [
