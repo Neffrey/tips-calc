@@ -2,13 +2,13 @@
 import { useLayoutEffect } from "react";
 
 // HELPERS
-import useTipStore from "~/components/stores/tip-store";
+import useDataStore from "~/components/stores/data-store";
 import { api } from "~/trpc/react";
 
 const TipData = () => {
   const tipData = api.tip.findAll.useQuery();
-  const tips = useTipStore((state) => state.tips);
-  const setTips = useTipStore((state) => state.setTips);
+  const tips = useDataStore((state) => state.tips);
+  const setTips = useDataStore((state) => state.setTips);
 
   //   const memoizedTips = useMemo(() => {
   //     if (tipData.data) {

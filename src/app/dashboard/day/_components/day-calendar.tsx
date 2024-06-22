@@ -6,7 +6,6 @@ import useDataStore from "~/components/stores/data-store";
 import { cn, tippedIncludes } from "~/lib/utils";
 
 // COMPONENTS
-import useTipStore from "~/components/stores/tip-store";
 import { Calendar } from "~/components/ui/calendar";
 
 // COMP
@@ -19,7 +18,7 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
   // const viewMonthTippedDays = useDataStore(
   //   (state) => state.viewMonthTippedDays,
   // );
-  const tips = useTipStore((state) => state.tips);
+  const tips = useDataStore((state) => state.tips);
 
   // Keep viewMonth in sync with viewDate
   useEffect(

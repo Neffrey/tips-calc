@@ -3,7 +3,6 @@ import { useEffect } from "react";
 
 // UTILS
 import useDataStore from "~/components/stores/data-store";
-import useTipStore from "~/components/stores/tip-store";
 import { cn, tippedIncludes } from "~/lib/utils";
 
 // COMPONENTS
@@ -21,7 +20,7 @@ const WeekCalender = ({ className = "" }: { className?: string }) => {
   // );
   const viewWeek = useDataStore((state) => state.viewWeek);
   const setViewWeek = useDataStore((state) => state.setViewWeek);
-  const tips = useTipStore((state) => state.tips);
+  const tips = useDataStore((state) => state.tips);
 
   // Keep viewMonth in sync with viewDate
   useEffect(

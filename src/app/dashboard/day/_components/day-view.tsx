@@ -58,6 +58,7 @@ const DayView = () => {
   const viewDate = useDataStore((state) => state.viewDate);
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
+  const tips = useDataStore((state) => state.tips);
   // const addDayToViewMonthTippedDays = useDataStore(
   //   (state) => state.addDayToViewMonthTippedDays,
   // );
@@ -268,6 +269,12 @@ const DayView = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="py-4">
+            <Button onClick={() => console.log("tips: ", tips)}>
+              Log tips
+            </Button>
           </div>
 
           <div className="pt-4" />
