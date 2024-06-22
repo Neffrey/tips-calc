@@ -58,9 +58,9 @@ const DayView = () => {
   const viewDate = useDataStore((state) => state.viewDate);
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
-  const addDayToViewMonthTippedDays = useDataStore(
-    (state) => state.addDayToViewMonthTippedDays,
-  );
+  // const addDayToViewMonthTippedDays = useDataStore(
+  //   (state) => state.addDayToViewMonthTippedDays,
+  // );
 
   // QUERIES
   const viewDatesTip = api.tip.findSingle.useQuery({
@@ -70,7 +70,7 @@ const DayView = () => {
   const createTip = api.tip.create.useMutation({
     onSuccess: () => {
       void viewDatesTip.refetch();
-      addDayToViewMonthTippedDays(viewDate);
+      // addDayToViewMonthTippedDays(viewDate);
     },
   });
 
