@@ -32,17 +32,6 @@ const Footer = () => {
           neffrey
         </Button>
       </Link>
-      <div className="flex w-full flex-col">
-        <p className="w-full text-center text-sm text-secondary-foreground">
-          {`Current Time: ${currentTime.toLocaleTimeString()}`}
-        </p>
-        <p className="w-full text-center text-sm text-secondary-foreground">
-          {`Current Times Date: ${currentTime.toLocaleDateString()}`}
-        </p>
-        <p className="w-full text-center text-sm text-secondary-foreground">
-          {`Current Date: ${currentDate.toLocaleDateString()}`}
-        </p>
-      </div>
     </div>
   );
 };
