@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 // UTILS
 import useDataStore from "~/components/stores/data-store";
-import { cn, tippedIncludes } from "~/lib/utils";
+import { cn, tippedIncludesDay } from "~/lib/utils";
 
 // COMPONENTS
 import { Calendar } from "~/components/ui/calendar";
@@ -15,9 +15,6 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
   const setViewDate = useDataStore((state) => state.setViewDate);
   const viewMonth = useDataStore((state) => state.viewMonth);
   const setViewMonth = useDataStore((state) => state.setViewMonth);
-  // const viewMonthTippedDays = useDataStore(
-  //   (state) => state.viewMonthTippedDays,
-  // );
   const tips = useDataStore((state) => state.tips);
 
   // Keep viewMonth in sync with viewDate
@@ -59,23 +56,8 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
             }) ?? [],
         }}
         modifiersClassNames={{
-          todaysDate: cn(
-            "border-solid border-2 bg-transparent border-foreground",
-            viewDate.getTime() === currentDate.getTime()
-              ? // Today === viewDate - check if tipped
-                tippedIncludes({ date: currentDate, tipData: tips })
-                ? // If today is viewDate & tip entered
-                  "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
-                : // If today is viewDate & no tip entered
-                  "bg-primary/80 text-primary-foreground"
-              : // Today !== viewDate - check if tipped
-                tippedIncludes({ date: currentDate, tipData: tips })
-                ? // If today is not viewDate & tip entered
-                  "bg-secondary/80 text-secondary-foreground"
-                : // If today is not viewDate & no tip entered
-                  "bg-secondary/0 text-foreground",
-          ),
-          selected: tippedIncludes({ date: viewDate, tipData: tips })
+          todaysDate: "border-solid border-2 border-foreground",
+          selected: tippedIncludesDay({ date: viewDate, tipData: tips })
             ? "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
             : "bg-primary/80 text-primary-foreground",
           tipped: "bg-secondary/80 text-secondary-foreground",

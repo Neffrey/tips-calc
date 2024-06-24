@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 // UTILS
 import useDataStore from "~/components/stores/data-store";
-import { cn, tippedIncludes } from "~/lib/utils";
+import { cn, tippedIncludesDay } from "~/lib/utils";
 
 // COMPONENTS
 import { Calendar } from "~/components/ui/calendar";
@@ -69,20 +69,20 @@ const WeekCalender = ({ className = "" }: { className?: string }) => {
             "border-solid border-2 bg-transparent border-foreground",
             viewDate.getTime() === currentDate.getTime()
               ? // Today === viewDate - check if tipped
-                tippedIncludes({ date: currentDate, tipData: tips })
+                tippedIncludesDay({ date: currentDate, tipData: tips })
                 ? // If today is viewDate & tip entered
                   "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
                 : // If today is viewDate & no tip entered
                   "bg-primary/80 text-primary-foreground"
               : // Today !== viewDate - check if tipped
-                tippedIncludes({ date: currentDate, tipData: tips })
+                tippedIncludesDay({ date: currentDate, tipData: tips })
                 ? // If today is not viewDate & tip entered
                   "bg-secondary/80 text-secondary-foreground"
                 : // If today is not viewDate & no tip entered
                   "bg-secondary/0 text-foreground",
           ),
           selected: "bg-transparent text-primary-foreground", //border-2 border-solid
-          // selected: tippedIncludes(viewDate)
+          // selected: tippedIncludesDay(viewDate)
           //   ? "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
           //   : "bg-primary/80 text-primary-foreground",
           tipped: "bg-secondary/80 text-secondary-foreground",

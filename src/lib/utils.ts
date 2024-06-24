@@ -10,20 +10,20 @@ export function twoDecimals(n: number) {
   return Math.round(n * 100) / 100;
 }
 
-export const tippedIncludes = ({
+export const tippedIncludesDay = ({
   date,
   tipData,
 }: {
   date: Date;
   tipData: Tips;
 }) => {
-  let tipEnteredToday = false;
+  let isTipped = false;
   tipData?.every((tip) => {
     if (tip.date.getTime() === date.getTime()) {
-      tipEnteredToday = true;
+      isTipped = true;
       return false;
     }
     return true;
   });
-  return tipEnteredToday;
+  return isTipped;
 };

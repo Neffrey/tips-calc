@@ -1,6 +1,6 @@
 // LIBS
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   FaCheck,
@@ -11,10 +11,10 @@ import {
 import { z } from "zod";
 
 // HELPERS
-import useDataStore from "~/components/stores/data-store";
+import useDataStore, { type Tip } from "~/components/stores/data-store";
 import useThemeStore from "~/components/stores/theme-store";
 import { getDaysDifference } from "~/lib/time-date";
-import { twoDecimals } from "~/lib/utils";
+import { cn, twoDecimals } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
 // COMPONENTS
@@ -29,9 +29,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
-import { cn } from "~/lib/utils";
 import DayControlBtns from "./day-control-btns";
-import DaySkeleton from "./day-skeleton";
 
 // CONSTANTS
 export const addTipFormSchema = z.object({
@@ -59,25 +57,33 @@ const DayView = () => {
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
   const tips = useDataStore((state) => state.tips);
-  // const addDayToViewMonthTippedDays = useDataStore(
-  //   (state) => state.addDayToViewMonthTippedDays,
-  // );
+
+  const [viewDatesTip, setViewDatesTip] = useState<Tip | undefined | null>(
+    tips?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+  );
 
   // QUERIES
-  const viewDatesTip = api.tip.findSingle.useQuery({
-    date: viewDate,
-  });
+  const tipsQuery = api.tip.findAll.useQuery();
 
   const createTip = api.tip.create.useMutation({
     onSuccess: () => {
-      void viewDatesTip.refetch();
-      // addDayToViewMonthTippedDays(viewDate);
+      void tipsQuery.refetch();
+      setViewDatesTip(
+        tipsQuery.data?.find(
+          (tip) => tip.date.getTime() === viewDate.getTime(),
+        ),
+      );
     },
   });
 
   const editTip = api.tip.edit.useMutation({
     onSuccess: () => {
-      void viewDatesTip.refetch();
+      void tipsQuery.refetch();
+      setViewDatesTip(
+        tipsQuery.data?.find(
+          (tip) => tip.date.getTime() === viewDate.getTime(),
+        ),
+      );
     },
   });
 
@@ -85,17 +91,13 @@ const DayView = () => {
   const form = useForm<z.infer<typeof addTipFormSchema>>({
     resolver: zodResolver(addTipFormSchema),
     defaultValues: {
-      hours: viewDatesTip?.data?.hours
-        ? viewDatesTip.data.hours.toString()
+      hours: viewDatesTip?.hours ? viewDatesTip.hours.toString() : "0",
+      amount: viewDatesTip?.amount ? viewDatesTip.amount.toString() : "0",
+      cashDrawerStart: viewDatesTip?.cashDrawerStart
+        ? viewDatesTip.cashDrawerStart.toString()
         : "0",
-      amount: viewDatesTip?.data?.amount
-        ? viewDatesTip.data.amount.toString()
-        : "0",
-      cashDrawerStart: viewDatesTip?.data?.cashDrawerStart
-        ? viewDatesTip.data.cashDrawerStart.toString()
-        : "0",
-      cashDrawerEnd: viewDatesTip?.data?.cashDrawerEnd
-        ? viewDatesTip.data.cashDrawerEnd.toString()
+      cashDrawerEnd: viewDatesTip?.cashDrawerEnd
+        ? viewDatesTip.cashDrawerEnd.toString()
         : "0",
     },
   });
@@ -109,7 +111,7 @@ const DayView = () => {
       cashDrawerEnd: values.cashDrawerEnd,
       date: viewDate,
     };
-    viewDatesTip.data
+    viewDatesTip
       ? editTip.mutate(validatedValues)
       : createTip.mutate(validatedValues);
   };
@@ -125,20 +127,14 @@ const DayView = () => {
 
   // Calc UI States
   const calcViewDatesStats = () => {
-    if (!viewDatesTip?.data) {
+    if (!viewDatesTip) {
       return 0;
     }
     return twoDecimals(
-      Number(viewDatesTip?.data?.amount ? viewDatesTip.data.amount : 0) +
+      Number(viewDatesTip?.amount ? viewDatesTip.amount : 0) +
+        Number(viewDatesTip?.cashDrawerEnd ? viewDatesTip.cashDrawerEnd : 0) -
         Number(
-          viewDatesTip?.data?.cashDrawerEnd
-            ? viewDatesTip.data.cashDrawerEnd
-            : 0,
-        ) -
-        Number(
-          viewDatesTip?.data?.cashDrawerStart
-            ? viewDatesTip.data.cashDrawerStart
-            : 0,
+          viewDatesTip?.cashDrawerStart ? viewDatesTip.cashDrawerStart : 0,
         ),
     );
   };
@@ -150,45 +146,43 @@ const DayView = () => {
   // Update UI States
   useLayoutEffect(
     () => {
+      setViewDatesTip(
+        tips?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+      );
       setViewDatesTotalMoney(calcViewDatesStats());
     },
     // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip.data],
+    [viewDatesTip, tips, tipsQuery.data, viewDate],
   );
 
   // SET FORM VALUES ON DATA CHANGE
-  useEffect(
+  useLayoutEffect(
     () => {
-      // resetFormValues();
-      if (!viewDatesTip.data) {
+      if (!viewDatesTip) {
         form.setValue("amount", "0");
         form.setValue("hours", "0");
         form.setValue("cashDrawerStart", "0");
         form.setValue("cashDrawerEnd", "0");
       }
-      if (viewDatesTip.data) {
-        form.setValue("amount", viewDatesTip.data.amount.toString());
-        form.setValue("hours", viewDatesTip.data.hours.toString());
-        if (viewDatesTip.data.cashDrawerStart) {
+      if (viewDatesTip) {
+        form.setValue("amount", viewDatesTip.amount.toString());
+        form.setValue("hours", viewDatesTip.hours.toString());
+        if (viewDatesTip.cashDrawerStart) {
           form.setValue(
             "cashDrawerStart",
-            viewDatesTip.data.cashDrawerStart.toString(),
+            viewDatesTip.cashDrawerStart.toString(),
           );
         } else {
           form.setValue("cashDrawerStart", "0");
         }
-        if (viewDatesTip.data.cashDrawerEnd) {
-          form.setValue(
-            "cashDrawerEnd",
-            viewDatesTip.data.cashDrawerEnd.toString(),
-          );
+        if (viewDatesTip.cashDrawerEnd) {
+          form.setValue("cashDrawerEnd", viewDatesTip.cashDrawerEnd.toString());
         }
         // Show cash drawer if either start or end is not 0
         if (
-          (viewDatesTip.data.cashDrawerStart &&
-            viewDatesTip.data.cashDrawerStart !== 0) ??
-          (viewDatesTip.data.cashDrawerEnd &&
-            viewDatesTip.data.cashDrawerEnd !== 0)
+          (viewDatesTip.cashDrawerStart &&
+            viewDatesTip.cashDrawerStart !== 0) ??
+          (viewDatesTip.cashDrawerEnd && viewDatesTip.cashDrawerEnd !== 0)
           // TODO: Keep open if profile default is cashDrawerOpen
         ) {
           setCashDrawer(true);
@@ -199,21 +193,19 @@ const DayView = () => {
     },
 
     // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip.data, viewDate],
+    [viewDatesTip, viewDate],
   );
 
   // RETURN COMPONENT
   return (
     <div className="flex flex-col gap-4">
-      {viewDatesTip.isLoading && viewDatesTip?.data ? (
-        <DaySkeleton />
-      ) : (
+      {
         <div className="flex w-full flex-col items-center justify-between gap-2 rounded-lg bg-card px-4 py-3">
           <DayControlBtns />
           <div
             className={cn(
               "flex flex-wrap justify-between gap-3 rounded-lg bg-popover px-6 py-5 text-popover-foreground",
-              viewDatesTip.data ? "" : "cursor-not-allowed",
+              viewDatesTip ? "" : "cursor-not-allowed",
             )}
           >
             <div className="flex flex-col">
@@ -227,9 +219,9 @@ const DayView = () => {
               <h3 className="">{getDaysDifference(viewDate, currentDate)}</h3>
             </div>
             <div className="flex items-center">
-              {viewDatesTip.data ? "Tip Entered" : "No Tip Data"}
+              {viewDatesTip ? "Tip Entered" : "No Tip Data"}
               <div className="pl-3" />
-              {viewDatesTip.data ? (
+              {viewDatesTip ? (
                 <FaCheck className="text-primary" />
               ) : (
                 <FaExclamationCircle className="text-accent" />
@@ -238,7 +230,7 @@ const DayView = () => {
             <div
               className={cn(
                 "flex w-full",
-                viewDatesTip.data
+                viewDatesTip
                   ? "text-popover-foreground"
                   : "text-popover-foreground/40",
               )}
@@ -251,30 +243,23 @@ const DayView = () => {
                 <div className="flex items-center gap-3">
                   <FaRegClock />
                   <span>
-                    {/* {viewDatesTotalHours
-                      ? twoDecimals(viewDatesTotalHours).toString()
-                      : "0"} */}
-                    {viewDatesTip?.data?.hours.toString() ?? "0"}
+                    {viewDatesTip?.hours
+                      ? twoDecimals(viewDatesTip.hours).toString()
+                      : "0"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span>$ per H</span>
                   <span>
-                    {viewDatesTotalMoney && viewDatesTip?.data?.hours
+                    {viewDatesTotalMoney && viewDatesTip?.hours
                       ? twoDecimals(
-                          viewDatesTotalMoney / viewDatesTip?.data?.hours,
+                          viewDatesTotalMoney / viewDatesTip?.hours,
                         ).toString()
                       : "0"}
                   </span>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="py-4">
-            <Button onClick={() => console.log("tips: ", tips)}>
-              Log tips
-            </Button>
           </div>
 
           <div className="pt-4" />
@@ -287,7 +272,7 @@ const DayView = () => {
               className="flex w-full flex-col gap-4 p-6"
             >
               <h3 className="text-lg font-bold">
-                {`${viewDatesTip.data ? "Edit Existing" : "Add"} Tip`}
+                {`${viewDatesTip ? "Edit Existing" : "Add"} Tip`}
               </h3>
               <div className="flex w-full justify-between gap-3">
                 <FormField
@@ -375,12 +360,12 @@ const DayView = () => {
                 type="submit"
                 className="rounded-xl px-8 py-6 text-xl font-bold"
               >
-                {`${viewDatesTip.data ? "Edit" : "Add"} Tip`}
+                {`${viewDatesTip ? "Edit" : "Add"} Tip`}
               </Button>
             </form>
           </Form>
         </div>
-      )}
+      }
     </div>
   );
 };

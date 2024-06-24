@@ -12,18 +12,16 @@ import {
 } from "~/lib/time-date";
 
 // TYPES
-export type Tips =
-  | {
-      id: string;
-      user: string;
-      date: Date;
-      hours: number;
-      amount: number;
-      cashDrawerStart: number | null;
-      cashDrawerEnd: number | null;
-    }[]
-  | null
-  | undefined;
+export type Tip = {
+  id: string;
+  user: string;
+  date: Date;
+  hours: number;
+  amount: number;
+  cashDrawerStart: number | null;
+  cashDrawerEnd: number | null;
+};
+export type Tips = Tip[] | null | undefined;
 
 export interface TimeStoreTypes {
   currentTime: Date;
