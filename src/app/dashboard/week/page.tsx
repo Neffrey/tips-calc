@@ -8,7 +8,6 @@
 import TipData from "~/app/_components/tip-data";
 import NotLoggedIn from "~/components/not-logged-in";
 import ProtectedContent from "~/components/protectedContent";
-import useDataStore from "~/components/stores/data-store";
 import WeekCalender from "./_components/week-calendar";
 import WeekView from "./_components/week-view";
 
@@ -27,28 +26,6 @@ export type TipData =
   | undefined;
 
 const WeekPage = () => {
-  const viewMonth = useDataStore((state) => state.viewMonth);
-  // const setViewMonthTippedDays = useDataStore(
-  //   (state) => state.setViewMonthTippedDays,
-  // );
-
-  // Fetch viewMonth tips
-  // const viewMonthsTips = api.tip.findWithinRange.useQuery({
-  //   startDate: findViewMonthStart(viewMonth),
-  //   endDate: findViewMonthEnd(viewMonth),
-  // });
-
-  // useLayoutEffect(
-  //   () => {
-  //     if (viewMonthsTips.data) {
-  //       setViewMonthTippedDays(viewMonthsTips.data?.map((tip) => tip.date));
-  //       setTipData(viewMonthsTips.data);
-  //     }
-  //   },
-  //   // eslint-disable-next-line -- only when viewMonthsTips.data changes
-  //   [viewMonthsTips.data],
-  // );
-
   return (
     <div
       // HERO ROW
