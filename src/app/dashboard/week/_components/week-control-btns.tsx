@@ -15,7 +15,7 @@ const WeekControlBtns = () => {
   const setViewAsPrevious = () => {
     setViewWeek(
       new Date(
-        new Date().setTime(viewWeek.start.getTime() - 1000 * 60 * 60 * 24 * 7), // - 1 week in ms
+        new Date().setTime(viewWeek.from.getTime() - 1000 * 60 * 60 * 24 * 7), // - 1 week in ms
       ),
     );
   };
@@ -27,7 +27,7 @@ const WeekControlBtns = () => {
   const setViewAsNext = () => {
     setViewWeek(
       new Date(
-        new Date().setTime(viewWeek.start.getTime() + 1000 * 60 * 60 * 24 * 7), // + 1 week in ms
+        new Date().setTime(viewWeek.from.getTime() + 1000 * 60 * 60 * 24 * 7), // + 1 week in ms
       ),
     );
   };

@@ -12,20 +12,13 @@ import DaySkeleton from "./day-skeleton";
 import WeekControlBtns from "./week-control-btns";
 
 // TYPES
-import { Button } from "~/components/ui/button";
 
 // COMP
 const WeekView = () => {
-  const viewDate = useDataStore((state) => state.viewDate);
   const viewWeek = useDataStore((state) => state.viewWeek);
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
   const tips = useDataStore((state) => state.tips);
-
-  // QUERIES
-  // const viewDatesTip = api.tip.findSingle.useQuery({
-  //   date: viewDate,
-  // });
 
   // Keep Current Date Updated
   useLayoutEffect(() => {
@@ -42,7 +35,7 @@ const WeekView = () => {
       return 0;
     }
     return tips.reduce((acc, tip) => {
-      if (tip.date >= viewWeek.start && tip.date <= viewWeek.end) {
+      if (tip.date >= viewWeek.from && tip.date <= viewWeek.to) {
         return (
           acc +
           Number(tip.amount) +
@@ -59,7 +52,7 @@ const WeekView = () => {
       return 0;
     }
     return tips.reduce((acc, tip) => {
-      if (tip.date >= viewWeek.start && tip.date <= viewWeek.end) {
+      if (tip.date >= viewWeek.from && tip.date <= viewWeek.to) {
         return Number(acc) + Number(tip.hours);
       }
       return acc;
@@ -72,7 +65,7 @@ const WeekView = () => {
     }
     return tips.reduce(
       (acc, tip) =>
-        tip.date >= viewWeek.start && tip.date <= viewWeek.end ? acc + 1 : acc,
+        tip.date >= viewWeek.from && tip.date <= viewWeek.to ? acc + 1 : acc,
       0,
     );
   };
@@ -108,14 +101,14 @@ const WeekView = () => {
             )}
           >
             <h2 className="text-xl font-bold">
-              {viewWeek.start.toLocaleDateString(undefined, {
+              {viewWeek.from.toLocaleDateString(undefined, {
                 weekday: "short",
                 month: "long",
                 day: "numeric",
               })}
             </h2>
             <h2 className="text-xl font-bold">
-              {viewWeek.end.toLocaleDateString(undefined, {
+              {viewWeek.to.toLocaleDateString(undefined, {
                 weekday: "short",
                 month: "long",
                 day: "numeric",
@@ -150,9 +143,6 @@ const WeekView = () => {
                     {calcViewWeeksDays().toString() ?? "0"}
                   </span>
                 </div>
-                <Button onClick={() => console.log("tipData: ", tips)}>
-                  Log data
-                </Button>
               </div>
             </div>
           </div>
