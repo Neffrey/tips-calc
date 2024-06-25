@@ -2,15 +2,11 @@
 
 // LIBRARIES
 import Link from "next/link";
-import useDataStore from "~/components/stores/data-store";
 
 // COMPONENTS
 import { Button } from "~/components/ui/button";
 
 const Footer = () => {
-  const currentTime = useDataStore((state) => state.currentDate);
-  const currentDate = useDataStore((state) => state.currentDate);
-
   return (
     <div
       // Row Container
