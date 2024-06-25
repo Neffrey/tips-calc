@@ -6,6 +6,7 @@ import { DayPicker } from "react-day-picker";
 
 import { buttonVariants } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
+import useDataStore from "../stores/data-store";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -15,6 +16,9 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const tips = useDataStore((state) => state.tips);
+  const viewDate = useDataStore((state) => state.viewDate);
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -39,7 +43,7 @@ function Calendar({
         cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md focus-within:relative focus-within:z-20", // [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-primary/70 hover:text-primary-foreground",
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-secondary hover:bg-primary/80 hover:text-primary-foreground focus:bg-secondary focus:bg-primary/80 focus:text-primary-foreground",
         ),
         day_range_end: "day-range-end",
         day_selected:

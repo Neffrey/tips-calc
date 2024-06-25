@@ -70,13 +70,13 @@ const WeekCalender = ({ className = "" }: { className?: string }) => {
             viewDate.getTime() === currentDate.getTime()
               ? // Today === viewDate - check if tipped
                 tippedIncludesDay({ date: currentDate, tipData: tips })
-                ? // If today is viewDate & tip entered
+                ? // If today is viewDate & has tip entered
                   "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
                 : // If today is viewDate & no tip entered
                   "bg-primary/80 text-primary-foreground"
               : // Today !== viewDate - check if tipped
                 tippedIncludesDay({ date: currentDate, tipData: tips })
-                ? // If today is not viewDate & tip entered
+                ? // If today is not viewDate & has tip entered
                   "bg-secondary/80 text-secondary-foreground"
                 : // If today is not viewDate & no tip entered
                   "bg-secondary/0 text-foreground",

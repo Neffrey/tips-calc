@@ -58,7 +58,7 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
         modifiersClassNames={{
           todaysDate: "border-solid border-2 border-foreground",
           selected: tippedIncludesDay({ date: viewDate, tipData: tips })
-            ? "bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground"
+            ? "bg-gradient-to-br from-primary/80 from-50% to-secondary/100 to-50% text-primary-foreground"
             : "bg-primary/80 text-primary-foreground",
           tipped: "bg-secondary/80 text-secondary-foreground",
         }}
@@ -76,7 +76,7 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
         Tip Entered
       </div>
       <div className="flex w-full items-start gap-4 p-2">
-        <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/80 to-secondary/100 text-primary-foreground" />
+        <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/80 from-50% to-secondary/100 to-50% text-primary-foreground" />
         Selected Day Has Tip
       </div>
     </div>
