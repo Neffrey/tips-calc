@@ -23,6 +23,7 @@ const DayPage = () => {
         </h1>
         <DayCalender />
         <DayView />
+        {/* <DayTable /> */}
       </ProtectedContent>
     </div>
   );

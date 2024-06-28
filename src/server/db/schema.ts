@@ -1,21 +1,19 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  date,
   index,
   integer,
   numeric,
-  pgEnum,
-  date,
   pgTableCreator,
   primaryKey,
   text,
   timestamp,
   varchar,
-  bigint,
 } from "drizzle-orm/pg-core";
-import type { AdapterAccount } from "next-auth/adapters";
 import { nanoid } from "nanoid/non-secure";
+import type { AdapterAccount } from "next-auth/adapters";
 
-import type { Prettify, InferSqlTable } from "~/lib/type-utils";
+import type { InferSqlTable, Prettify } from "~/lib/type-utils";
 
 // CONSTS
 export const COLOR_THEMES = [
@@ -78,7 +76,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   profilePictures: many(profilePictures),
   tips: many(tips),
-  // reports: many(reports),
   baseWages: many(baseWages),
 }));
 
@@ -195,7 +192,7 @@ export const baseWages = createTable(
     user: text("user")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    amount: numeric("amount").notNull(),
+    amount: numeric("amount").$type<number>().notNull(),
     startDate: timestamp("startDate", {
       mode: "date",
     }).notNull(),
@@ -207,8 +204,9 @@ export const baseWages = createTable(
   }),
 );
 
-export const baseWagesRelations = relations(baseWages, ({ one }) => ({
+export const baseWagesRelations = relations(baseWages, ({ one, many }) => ({
   user: one(users, { fields: [baseWages.user], references: [users.id] }),
+  tips: many(tips),
 }));
 
 export type Tip = Prettify<InferSqlTable<typeof tips>>;
@@ -225,10 +223,13 @@ export const tips = createTable(
     date: date("date", {
       mode: "date",
     }).notNull(),
+    baseWage: numeric("baseWage").$type<number>(),
     hours: numeric("hours").$type<number>().notNull(),
-    amount: numeric("amount").$type<number>().notNull(),
+    cardTip: numeric("cardTip").$type<number>().notNull(),
     cashDrawerStart: numeric("cashDrawerStart").$type<number>(),
     cashDrawerEnd: numeric("cashDrawerEnd").$type<number>(),
+    total: numeric("total").$type<number>(),
+    perHour: numeric("perHour").$type<number>(),
   },
   (tip) => ({
     tipIdIndex: index("tip_id_index").on(tip.id),
@@ -237,60 +238,10 @@ export const tips = createTable(
   }),
 );
 
-export const tipRelations = relations(tips, ({ one, many }) => ({
+export const tipRelations = relations(tips, ({ one }) => ({
   user: one(users, { fields: [tips.user], references: [users.id] }),
+  baseWage: one(baseWages, {
+    fields: [tips.baseWage],
+    references: [baseWages.amount],
+  }),
 }));
-
-// export const REPORT_TYPES_ENUM = pgEnum("popularity", [
-//   "WEEK",
-//   "MONTH",
-//   "YEAR",
-// ]);
-
-// export type Report = Prettify<InferSqlTable<typeof reports>>;
-// export const reports = createTable(
-//   "report",
-//   {
-//     id: text("id")
-//       .notNull()
-//       .primaryKey()
-//       .$default(() => nanoid(12)),
-//     user: text("user")
-//       .notNull()
-//       .references(() => users.id, { onDelete: "cascade" }),
-//     type: REPORT_TYPES_ENUM("type").default(REPORT_TYPES_ENUM.enumValues[0]),
-//     // total: numeric("total").notNull(),
-//     // hourly: numeric("hourly").notNull(),
-//     startEpochTime: numeric("startEpochTime").$type<number>().notNull(),
-//     endEpochTime: numeric("endEpochTime").$type<number>().notNull(),
-//   },
-//   (report) => ({
-//     idIndex: index("report_id_index").on(report.id),
-//   }),
-// );
-
-// export const reportRelations = relations(reports, ({ one, many }) => ({
-//   user: one(users, { fields: [reports.user], references: [users.id] }),
-//   tipsToReports: many(tipsToReports),
-// }));
-
-// export const tipsToReports = createTable(
-//   "tipToReport",
-//   {
-//     tipId: text("tipId").notNull(),
-//     reportId: text("reportId").notNull(),
-//   },
-//   (tipToReport) => ({
-//     compoundKey: primaryKey({
-//       columns: [tipToReport.tipId, tipToReport.reportId],
-//     }),
-//   }),
-// );
-
-// export const tipsToReportsRelations = relations(tipsToReports, ({ one }) => ({
-//   tip: one(tips, { fields: [tipsToReports.tipId], references: [tips.id] }),
-//   report: one(reports, {
-//     fields: [tipsToReports.reportId],
-//     references: [reports.id],
-//   }),
-// }));

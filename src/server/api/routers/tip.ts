@@ -2,7 +2,7 @@ import "server-only";
 
 // Make sure you can't import this on client
 // LIBS
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { z } from "zod";
 
 // UTILS
@@ -18,18 +18,12 @@ import {
 // import type { Report } from "~/server/db/schema";
 
 export const tipRouter = createTRPCRouter({
-  findAll: userProcedure
-    // .input(
-    //   z.object({
-    //     date: z.date(),
-    //   }),
-    // )
-    .query(async ({ ctx }) => {
-      const data = await ctx.db.query.tips.findMany({
-        where: eq(tips.user, ctx.session.user.id),
-      });
-      return data ? data : null;
-    }),
+  findAll: userProcedure.query(async ({ ctx }) => {
+    const data = await ctx.db.query.tips.findMany({
+      where: eq(tips.user, ctx.session.user.id),
+    });
+    return data ? data : null;
+  }),
   findSingle: userProcedure
     .input(
       z.object({
@@ -72,7 +66,7 @@ export const tipRouter = createTRPCRouter({
             message: "Hourly must be a number",
           })
           .transform((val) => Number(val)),
-        amount: z
+        cardTip: z
           .string()
           .refine((val) => !Number.isNaN(Number(val)), {
             message: "Hourly must be a number",
@@ -93,17 +87,34 @@ export const tipRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const baseWageQuery = await ctx.db.query.baseWages.findMany({
+        where: eq(tips.user, ctx.session.user.id),
+        orderBy: [desc(tips.date)],
+        limit: 1,
+      });
+
+      const baseWage = baseWageQuery[0] ? baseWageQuery[0].amount : 0;
+
+      const tipTotal =
+        input.cardTip +
+        input.cashDrawerEnd -
+        input.cashDrawerStart +
+        baseWage * input.hours;
+
       return await ctx.db
         .insert(tips)
         .values({
           user: ctx.session.user.id,
           date: input.date,
           hours: input.hours,
-          amount: input.amount,
+          baseWage: baseWage,
+          cardTip: input.cardTip,
           cashDrawerStart: input?.cashDrawerStart
             ? input.cashDrawerStart
             : null,
           cashDrawerEnd: input?.cashDrawerEnd ? input.cashDrawerEnd : null,
+          total: tipTotal,
+          perHour: tipTotal / input.hours,
         })
         .returning();
     }),
@@ -117,7 +128,7 @@ export const tipRouter = createTRPCRouter({
             message: "Hourly must be a number",
           })
           .transform((val) => Number(val)),
-        amount: z
+        cardTip: z
           .string()
           .refine((val) => !Number.isNaN(Number(val)), {
             message: "Hourly must be a number",
@@ -140,15 +151,31 @@ export const tipRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const baseWageQuery = await ctx.db.query.baseWages.findMany({
+        where: eq(tips.user, ctx.session.user.id),
+        orderBy: [desc(tips.date)],
+        limit: 1,
+      });
+
+      const baseWage = baseWageQuery[0] ? baseWageQuery[0].amount : 0;
+
+      const tipTotal =
+        input.cardTip +
+        (input?.cashDrawerEnd ? input.cashDrawerEnd : 0) -
+        (input?.cashDrawerStart ? input.cashDrawerStart : 0) +
+        baseWage * input.hours;
+
       const tipResult = await ctx.db
         .update(tips)
         .set({
           hours: input.hours,
-          amount: input.amount,
+          cardTip: input.cardTip,
           cashDrawerStart: input?.cashDrawerStart
             ? input.cashDrawerStart
             : null,
           cashDrawerEnd: input?.cashDrawerEnd ? input.cashDrawerEnd : null,
+          total: tipTotal,
+          perHour: tipTotal / input.hours,
         })
         .where(
           and(eq(tips.user, ctx.session.user.id), eq(tips.date, input.date)),
