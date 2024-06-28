@@ -17,7 +17,7 @@ export type Tip = {
   user: string;
   date: Date;
   hours: number;
-  amount: number;
+  cardTip: number;
   cashDrawerStart: number | null;
   cashDrawerEnd: number | null;
 };
