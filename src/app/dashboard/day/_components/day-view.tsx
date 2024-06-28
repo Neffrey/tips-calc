@@ -36,7 +36,7 @@ export const addTipFormSchema = z.object({
   hours: z.string().refine((val) => !Number.isNaN(Number(val)), {
     message: "Hourly must be a number",
   }),
-  amount: z.string().refine((val) => !Number.isNaN(Number(val)), {
+  cardTip: z.string().refine((val) => !Number.isNaN(Number(val)), {
     message: "Hourly must be a number",
   }),
   cashDrawerStart: z.string().refine((val) => !Number.isNaN(Number(val)), {
@@ -92,7 +92,7 @@ const DayView = () => {
     resolver: zodResolver(addTipFormSchema),
     defaultValues: {
       hours: viewDatesTip?.hours ? viewDatesTip.hours.toString() : "0",
-      amount: viewDatesTip?.amount ? viewDatesTip.amount.toString() : "0",
+      cardTip: viewDatesTip?.cardTip ? viewDatesTip.cardTip.toString() : "0",
       cashDrawerStart: viewDatesTip?.cashDrawerStart
         ? viewDatesTip.cashDrawerStart.toString()
         : "0",
@@ -106,7 +106,7 @@ const DayView = () => {
   const handleSubmit = (values: z.infer<typeof addTipFormSchema>) => {
     const validatedValues = {
       hours: values.hours,
-      amount: values.amount,
+      cardTip: values.cardTip,
       cashDrawerStart: values.cashDrawerStart,
       cashDrawerEnd: values.cashDrawerEnd,
       date: viewDate,
@@ -131,7 +131,7 @@ const DayView = () => {
       return 0;
     }
     return twoDecimals(
-      Number(viewDatesTip?.amount ? viewDatesTip.amount : 0) +
+      Number(viewDatesTip?.cardTip ? viewDatesTip.cardTip : 0) +
         Number(viewDatesTip?.cashDrawerEnd ? viewDatesTip.cashDrawerEnd : 0) -
         Number(
           viewDatesTip?.cashDrawerStart ? viewDatesTip.cashDrawerStart : 0,
@@ -159,13 +159,13 @@ const DayView = () => {
   useLayoutEffect(
     () => {
       if (!viewDatesTip) {
-        form.setValue("amount", "0");
+        form.setValue("cardTip", "0");
         form.setValue("hours", "0");
         form.setValue("cashDrawerStart", "0");
         form.setValue("cashDrawerEnd", "0");
       }
       if (viewDatesTip) {
-        form.setValue("amount", viewDatesTip.amount.toString());
+        form.setValue("cardTip", viewDatesTip.cardTip.toString());
         form.setValue("hours", viewDatesTip.hours.toString());
         if (viewDatesTip.cashDrawerStart) {
           form.setValue(
@@ -277,7 +277,7 @@ const DayView = () => {
               <div className="flex w-full justify-between gap-3">
                 <FormField
                   control={form.control}
-                  name="amount"
+                  name="cardTip"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel className="text-md">$ Tip total</FormLabel>

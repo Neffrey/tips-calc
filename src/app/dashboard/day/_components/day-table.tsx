@@ -97,11 +97,11 @@ const DayTable = () => {
           return {
             date: tip.date,
             total:
-              tip.amount +
+              tip.cardTip +
               Number(tip.cashDrawerEnd ?? 0) -
               Number(tip.cashDrawerStart ?? 0),
             hours: tip.hours,
-            perHour: tip.amount / tip.hours,
+            perHour: tip.cardTip / tip.hours,
           };
         })
       : [],
