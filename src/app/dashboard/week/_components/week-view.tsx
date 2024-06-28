@@ -38,7 +38,7 @@ const WeekView = () => {
       if (tip.date >= viewWeek.from && tip.date <= viewWeek.to) {
         return (
           acc +
-          Number(tip.amount) +
+          Number(tip.cardTip) +
           Number(tip.cashDrawerEnd ?? 0) -
           Number(tip.cashDrawerStart ?? 0)
         );
