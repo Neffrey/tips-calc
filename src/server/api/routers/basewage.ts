@@ -21,16 +21,16 @@ export const baseWageRouter = createTRPCRouter({
       const data = await ctx.db.query.baseWages.findFirst({
         where: and(
           eq(baseWages.user, ctx.session.user.id),
-          lte(baseWages.startDate, input.date),
+          lte(baseWages.date, input.date),
         ),
-        orderBy: [desc(baseWages.startDate)],
+        orderBy: [desc(baseWages.date)],
       });
       return data ? data : null;
     }),
   create: userProcedure
     .input(
       z.object({
-        startDate: z.date().transform((val) => stripTime(val)),
+        date: z.date().transform((val) => stripTime(val)),
         amount: z.number(),
       }),
     )
@@ -38,9 +38,9 @@ export const baseWageRouter = createTRPCRouter({
       const nextBaseWage = await ctx.db.query.baseWages.findFirst({
         where: and(
           eq(baseWages.user, ctx.session.user.id),
-          gt(baseWages.startDate, input.startDate),
+          gt(baseWages.date, input.date),
         ),
-        orderBy: [asc(baseWages.startDate)],
+        orderBy: [asc(baseWages.date)],
       });
 
       const tipParams = () => {
@@ -48,15 +48,15 @@ export const baseWageRouter = createTRPCRouter({
           return {
             where: and(
               eq(baseWages.user, ctx.session.user.id),
-              gte(baseWages.startDate, input.startDate),
-              lt(baseWages.startDate, nextBaseWage.startDate),
+              gte(baseWages.date, input.date),
+              lt(baseWages.date, nextBaseWage.date),
             ),
           };
         }
         return {
           where: and(
             eq(baseWages.user, ctx.session.user.id),
-            gte(baseWages.startDate, input.startDate),
+            gte(baseWages.date, input.date),
           ),
         };
       };
@@ -88,7 +88,7 @@ export const baseWageRouter = createTRPCRouter({
 
       return await ctx.db.insert(baseWages).values({
         user: ctx.session.user.id,
-        startDate: input.startDate,
+        date: input.date,
         amount: input.amount,
       });
     }),
@@ -97,7 +97,7 @@ export const baseWageRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        startDate: z.date().transform((val) => stripTime(val)),
+        date: z.date().transform((val) => stripTime(val)),
         amount: z.number(),
       }),
     )
@@ -105,9 +105,9 @@ export const baseWageRouter = createTRPCRouter({
       const nextBaseWage = await ctx.db.query.baseWages.findFirst({
         where: and(
           eq(baseWages.user, ctx.session.user.id),
-          gt(baseWages.startDate, input.startDate),
+          gt(baseWages.date, input.date),
         ),
-        orderBy: [asc(baseWages.startDate)],
+        orderBy: [asc(baseWages.date)],
       });
 
       const tipParams = () => {
@@ -115,15 +115,15 @@ export const baseWageRouter = createTRPCRouter({
           return {
             where: and(
               eq(baseWages.user, ctx.session.user.id),
-              gte(baseWages.startDate, input.startDate),
-              lt(baseWages.startDate, nextBaseWage.startDate),
+              gte(baseWages.date, input.date),
+              lt(baseWages.date, nextBaseWage.date),
             ),
           };
         }
         return {
           where: and(
             eq(baseWages.user, ctx.session.user.id),
-            gte(baseWages.startDate, input.startDate),
+            gte(baseWages.date, input.date),
           ),
         };
       };
@@ -156,7 +156,7 @@ export const baseWageRouter = createTRPCRouter({
       return await ctx.db
         .update(baseWages)
         .set({
-          startDate: input?.startDate ?? undefined,
+          date: input?.date ?? undefined,
           amount: input?.amount ?? undefined,
         })
         .where(

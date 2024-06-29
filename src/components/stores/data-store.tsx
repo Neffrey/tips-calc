@@ -10,17 +10,9 @@ import {
   msUntilNextSecond,
   stripTime,
 } from "~/lib/time-date";
+import { type Tip } from "~/server/db/schema";
 
 // TYPES
-export type Tip = {
-  id: string;
-  user: string;
-  date: Date;
-  hours: number;
-  cardTip: number;
-  cashDrawerStart: number | null;
-  cashDrawerEnd: number | null;
-};
 export type Tips = Tip[] | null | undefined;
 
 export interface TimeStoreTypes {

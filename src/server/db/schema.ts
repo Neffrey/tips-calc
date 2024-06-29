@@ -193,14 +193,14 @@ export const baseWages = createTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     amount: numeric("amount").$type<number>().notNull(),
-    startDate: timestamp("startDate", {
+    date: timestamp("date", {
       mode: "date",
     }).notNull(),
   },
   (baseWage) => ({
     idIndex: index("wage_id_index").on(baseWage.id),
     userIndex: index("wage_user_index").on(baseWage.user),
-    effectiveAtIndex: index("wage_effective_at_index").on(baseWage.startDate),
+    effectiveAtIndex: index("wage_effective_at_index").on(baseWage.date),
   }),
 );
 

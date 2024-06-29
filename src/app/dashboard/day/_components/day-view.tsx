@@ -11,10 +11,11 @@ import {
 import { z } from "zod";
 
 // HELPERS
-import useDataStore, { type Tip } from "~/components/stores/data-store";
+import useDataStore from "~/components/stores/data-store";
 import useThemeStore from "~/components/stores/theme-store";
 import { getDaysDifference } from "~/lib/time-date";
 import { cn, twoDecimals } from "~/lib/utils";
+import { type Tip } from "~/server/db/schema";
 import { api } from "~/trpc/react";
 
 // COMPONENTS
@@ -56,33 +57,28 @@ const DayView = () => {
   const viewDate = useDataStore((state) => state.viewDate);
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
-  const tips = useDataStore((state) => state.tips);
+  // const tips = useDataStore((state) => state.tips);
 
+  // Tip Data
+  const tipsData = api.tip.findAll.useQuery();
   const [viewDatesTip, setViewDatesTip] = useState<Tip | undefined | null>(
-    tips?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+    tipsData?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
   );
-
-  // QUERIES
-  const tipsQuery = api.tip.findAll.useQuery();
 
   const createTip = api.tip.create.useMutation({
     onSuccess: () => {
-      void tipsQuery.refetch();
+      void tipsData.refetch();
       setViewDatesTip(
-        tipsQuery.data?.find(
-          (tip) => tip.date.getTime() === viewDate.getTime(),
-        ),
+        tipsData.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
       );
     },
   });
 
   const editTip = api.tip.edit.useMutation({
     onSuccess: () => {
-      void tipsQuery.refetch();
+      void tipsData.refetch();
       setViewDatesTip(
-        tipsQuery.data?.find(
-          (tip) => tip.date.getTime() === viewDate.getTime(),
-        ),
+        tipsData.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
       );
     },
   });
@@ -125,34 +121,23 @@ const DayView = () => {
     return () => clearInterval(interval);
   }, [msUntilNextDate, setCurrentDate]);
 
-  // Calc UI States
-  const calcViewDatesStats = () => {
-    if (!viewDatesTip) {
-      return 0;
-    }
-    return twoDecimals(
-      Number(viewDatesTip?.cardTip ? viewDatesTip.cardTip : 0) +
-        Number(viewDatesTip?.cashDrawerEnd ? viewDatesTip.cashDrawerEnd : 0) -
-        Number(
-          viewDatesTip?.cashDrawerStart ? viewDatesTip.cashDrawerStart : 0,
-        ),
+  useLayoutEffect(() => {
+    setViewDatesTip(
+      tipsData?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
     );
-  };
-
-  // UI STATES
-  const [viewDatesTotalMoney, setViewDatesTotalMoney] =
-    useState<number>(calcViewDatesStats());
+  }, [viewDatesTip, tipsData.data, viewDate]);
 
   // Update UI States
   useLayoutEffect(
     () => {
       setViewDatesTip(
-        tips?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+        tipsData?.data?.find(
+          (tip) => tip.date.getTime() === viewDate.getTime(),
+        ),
       );
-      setViewDatesTotalMoney(calcViewDatesStats());
     },
     // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip, tips, tipsQuery.data, viewDate],
+    [viewDatesTip, tipsData.data, viewDate],
   );
 
   // SET FORM VALUES ON DATA CHANGE
@@ -238,24 +223,20 @@ const DayView = () => {
               <div className="flex w-full items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <FaDollarSign />
-                  <span>{viewDatesTotalMoney.toString() ?? "0"}</span>
+                  <span>
+                    {twoDecimals(viewDatesTip?.total ?? 0).toString()}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <FaRegClock />
                   <span>
-                    {viewDatesTip?.hours
-                      ? twoDecimals(viewDatesTip.hours).toString()
-                      : "0"}
+                    {twoDecimals(viewDatesTip?.hours ?? 0).toString()}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span>$ per H</span>
                   <span>
-                    {viewDatesTotalMoney && viewDatesTip?.hours
-                      ? twoDecimals(
-                          viewDatesTotalMoney / viewDatesTip?.hours,
-                        ).toString()
-                      : "0"}
+                    {twoDecimals(viewDatesTip?.perHour ?? 0).toString()}
                   </span>
                 </div>
               </div>

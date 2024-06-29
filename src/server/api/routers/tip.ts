@@ -87,13 +87,12 @@ export const tipRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const baseWageQuery = await ctx.db.query.baseWages.findMany({
+      const baseWageQuery = await ctx.db.query.baseWages.findFirst({
         where: eq(tips.user, ctx.session.user.id),
         orderBy: [desc(tips.date)],
-        limit: 1,
       });
 
-      const baseWage = baseWageQuery[0] ? baseWageQuery[0].amount : 0;
+      const baseWage = baseWageQuery ? baseWageQuery.amount : 0;
 
       const tipTotal =
         input.cardTip +
@@ -151,13 +150,12 @@ export const tipRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const baseWageQuery = await ctx.db.query.baseWages.findMany({
+      const baseWageQuery = await ctx.db.query.baseWages.findFirst({
         where: eq(tips.user, ctx.session.user.id),
         orderBy: [desc(tips.date)],
-        limit: 1,
       });
 
-      const baseWage = baseWageQuery[0] ? baseWageQuery[0].amount : 0;
+      const baseWage = baseWageQuery ? baseWageQuery.amount : 0;
 
       const tipTotal =
         input.cardTip +
