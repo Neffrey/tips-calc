@@ -6,7 +6,6 @@ import { DayPicker } from "react-day-picker";
 
 import { buttonVariants } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
-import useDataStore from "../stores/data-store";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -16,9 +15,6 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  const tips = useDataStore((state) => state.tips);
-  const viewDate = useDataStore((state) => state.viewDate);
-
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}

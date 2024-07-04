@@ -5,6 +5,7 @@ import { FaDollarSign, FaRegClock } from "react-icons/fa";
 // HELPERS
 import useDataStore from "~/components/stores/data-store";
 import { twoDecimals } from "~/lib/utils";
+import { api } from "~/trpc/react";
 
 // COMPONENTS
 import { cn } from "~/lib/utils";
@@ -18,7 +19,8 @@ const WeekView = () => {
   const viewWeek = useDataStore((state) => state.viewWeek);
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
-  const tips = useDataStore((state) => state.tips);
+
+  const tips = api.tip.findAll.useQuery();
 
   // Keep Current Date Updated
   useLayoutEffect(() => {
@@ -34,7 +36,7 @@ const WeekView = () => {
     if (!tips) {
       return 0;
     }
-    return tips.reduce((acc, tip) => {
+    return tips?.data?.reduce((acc, tip) => {
       if (tip.date >= viewWeek.from && tip.date <= viewWeek.to) {
         return (
           acc +
@@ -51,7 +53,7 @@ const WeekView = () => {
     if (!tips) {
       return 0;
     }
-    return tips.reduce((acc, tip) => {
+    return tips?.data?.reduce((acc, tip) => {
       if (tip.date >= viewWeek.from && tip.date <= viewWeek.to) {
         return Number(acc) + Number(tip.hours);
       }
@@ -60,27 +62,31 @@ const WeekView = () => {
   };
 
   const calcViewWeeksDays = () => {
-    if (!tips) {
+    if (!tips.data) {
       return 0;
     }
-    return tips.reduce(
-      (acc, tip) =>
-        tip.date >= viewWeek.from && tip.date <= viewWeek.to ? acc + 1 : acc,
-      0,
+    return (
+      tips?.data?.reduce(
+        (acc, tip) =>
+          tip.date >= viewWeek.from && tip.date <= viewWeek.to ? acc + 1 : acc,
+        0,
+      ) ?? 0
     );
   };
 
   // UI STATES
-  const [viewWeeksAmount, setViewWeeksAmount] =
-    useState<number>(calcViewWeekAmount());
-  const [viewWeeksHours, setViewWeeksHours] =
-    useState<number>(calcViewWeeksHours());
+  const [viewWeeksAmount, setViewWeeksAmount] = useState<number>(
+    calcViewWeekAmount() ?? 0,
+  );
+  const [viewWeeksHours, setViewWeeksHours] = useState<number>(
+    calcViewWeeksHours() ?? 0,
+  );
 
   // Update UI States
   useLayoutEffect(
     () => {
-      setViewWeeksAmount(calcViewWeekAmount());
-      setViewWeeksHours(calcViewWeeksHours());
+      setViewWeeksAmount(calcViewWeekAmount() ?? 0);
+      setViewWeeksHours(calcViewWeeksHours() ?? 0);
     },
     // eslint-disable-next-line -- only want dependency on data
     [tips, viewWeek],

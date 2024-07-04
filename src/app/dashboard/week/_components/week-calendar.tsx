@@ -4,6 +4,7 @@ import { useEffect } from "react";
 // UTILS
 import useDataStore from "~/components/stores/data-store";
 import { cn } from "~/lib/utils";
+import { api } from "~/trpc/react";
 
 // COMPONENTS
 import { Calendar } from "~/components/ui/calendar";
@@ -17,7 +18,8 @@ const WeekCalender = ({ className = "" }: { className?: string }) => {
   const setViewMonth = useDataStore((state) => state.setViewMonth);
   const viewWeek = useDataStore((state) => state.viewWeek);
   const setViewWeek = useDataStore((state) => state.setViewWeek);
-  const tips = useDataStore((state) => state.tips);
+
+  const tips = api.tip.findAll.useQuery();
 
   // Keep viewMonth in sync with viewDate
   useEffect(
@@ -54,11 +56,11 @@ const WeekCalender = ({ className = "" }: { className?: string }) => {
         modifiers={{
           todaysDate: currentDate,
           tipped:
-            tips?.map((tip) => {
+            tips?.data?.map((tip) => {
               return new Date(tip.date);
             }) ?? [],
           tippedAndViewWeek:
-            tips?.reduce((acc, tip) => {
+            tips?.data?.reduce((acc, tip) => {
               if (tip.date >= viewWeek.from && tip.date <= viewWeek.to) {
                 return [...acc, new Date(tip.date)];
               }

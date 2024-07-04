@@ -57,28 +57,27 @@ const DayView = () => {
   const viewDate = useDataStore((state) => state.viewDate);
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
-  // const tips = useDataStore((state) => state.tips);
 
   // Tip Data
-  const tipsData = api.tip.findAll.useQuery();
+  const tips = api.tip.findAll.useQuery();
   const [viewDatesTip, setViewDatesTip] = useState<Tip | undefined | null>(
-    tipsData?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+    tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
   );
 
   const createTip = api.tip.create.useMutation({
     onSuccess: () => {
-      void tipsData.refetch();
+      void tips.refetch();
       setViewDatesTip(
-        tipsData.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+        tips.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
       );
     },
   });
 
   const editTip = api.tip.edit.useMutation({
     onSuccess: () => {
-      void tipsData.refetch();
+      void tips.refetch();
       setViewDatesTip(
-        tipsData.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+        tips.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
       );
     },
   });
@@ -123,21 +122,19 @@ const DayView = () => {
 
   useLayoutEffect(() => {
     setViewDatesTip(
-      tipsData?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+      tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
     );
-  }, [viewDatesTip, tipsData.data, viewDate]);
+  }, [viewDatesTip, tips.data, viewDate]);
 
   // Update UI States
   useLayoutEffect(
     () => {
       setViewDatesTip(
-        tipsData?.data?.find(
-          (tip) => tip.date.getTime() === viewDate.getTime(),
-        ),
+        tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
       );
     },
     // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip, tipsData.data, viewDate],
+    [viewDatesTip, tips.data, viewDate],
   );
 
   // SET FORM VALUES ON DATA CHANGE

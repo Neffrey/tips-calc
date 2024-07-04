@@ -4,6 +4,7 @@ import { useEffect } from "react";
 // UTILS
 import useDataStore from "~/components/stores/data-store";
 import { cn, tippedIncludesDay } from "~/lib/utils";
+import { api } from "~/trpc/react";
 
 // COMPONENTS
 import { Calendar } from "~/components/ui/calendar";
@@ -15,7 +16,8 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
   const setViewDate = useDataStore((state) => state.setViewDate);
   const viewMonth = useDataStore((state) => state.viewMonth);
   const setViewMonth = useDataStore((state) => state.setViewMonth);
-  const tips = useDataStore((state) => state.tips);
+
+  const tips = api.tip.findAll.useQuery();
 
   // Keep viewMonth in sync with viewDate
   useEffect(
@@ -51,13 +53,16 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
         modifiers={{
           todaysDate: currentDate,
           tipped:
-            tips?.map((tip) => {
+            tips?.data?.map((tip) => {
               return new Date(tip.date);
             }) ?? [],
         }}
         modifiersClassNames={{
           todaysDate: "border-solid border-2 border-foreground",
-          selected: tippedIncludesDay({ date: viewDate, tipData: tips })
+          selected: tippedIncludesDay({
+            date: viewDate,
+            tipData: tips?.data,
+          })
             ? "bg-gradient-to-br from-secondary from-50% to-primary to-50% text-primary-foreground"
             : "bg-primary/80 text-primary-foreground",
           tipped: "bg-secondary/80 text-secondary-foreground",

@@ -8,7 +8,8 @@ import {
 } from "@tanstack/react-table";
 
 // HELPERS
-import useDataStore from "~/components/stores/data-store";
+import { twoDecimals } from "~/lib/utils";
+import { api } from "~/trpc/react";
 
 // COMPONENTS
 import { Button } from "~/components/ui/button";
@@ -20,7 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { twoDecimals } from "~/lib/utils";
 
 // TYPES
 type DayData = {
@@ -88,23 +88,22 @@ export const columns: ColumnDef<DayData>[] = [
 
 // COMP
 const DayTable = () => {
-  const tips = useDataStore((state) => state.tips);
+  const tips = api.tip.findAll.useQuery();
 
   const table = useReactTable({
     columns,
-    data: tips
-      ? tips.map((tip) => {
-          return {
-            date: tip.date,
-            total:
-              tip.cardTip +
-              Number(tip.cashDrawerEnd ?? 0) -
-              Number(tip.cashDrawerStart ?? 0),
-            hours: tip.hours,
-            perHour: tip.cardTip / tip.hours,
-          };
-        })
-      : [],
+    data:
+      tips?.data?.map((tip) => {
+        return {
+          date: tip.date,
+          total:
+            tip.cardTip +
+            Number(tip.cashDrawerEnd ?? 0) -
+            Number(tip.cashDrawerStart ?? 0),
+          hours: tip.hours,
+          perHour: tip.cardTip / tip.hours,
+        };
+      }) ?? [],
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
