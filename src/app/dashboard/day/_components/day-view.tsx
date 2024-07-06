@@ -86,14 +86,10 @@ const DayView = () => {
   const form = useForm<z.infer<typeof addTipFormSchema>>({
     resolver: zodResolver(addTipFormSchema),
     defaultValues: {
-      hours: viewDatesTip?.hours ? viewDatesTip.hours.toString() : "0",
-      cardTip: viewDatesTip?.cardTip ? viewDatesTip.cardTip.toString() : "0",
-      cashDrawerStart: viewDatesTip?.cashDrawerStart
-        ? viewDatesTip.cashDrawerStart.toString()
-        : "0",
-      cashDrawerEnd: viewDatesTip?.cashDrawerEnd
-        ? viewDatesTip.cashDrawerEnd.toString()
-        : "0",
+      hours: viewDatesTip?.hours.toString() ?? "0",
+      cardTip: viewDatesTip?.cardTip.toString() ?? "0",
+      cashDrawerStart: viewDatesTip?.cashDrawerStart?.toString() ?? "0",
+      cashDrawerEnd: viewDatesTip?.toString() ?? "0",
     },
   });
 
