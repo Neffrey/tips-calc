@@ -17,19 +17,8 @@ import WeekControlBtns from "./week-control-btns";
 // COMP
 const WeekView = () => {
   const viewWeek = useDataStore((state) => state.viewWeek);
-  const setCurrentDate = useDataStore((state) => state.setCurrentDate);
-  const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
 
   const tips = api.tip.findAll.useQuery();
-
-  // Keep Current Date Updated
-  useLayoutEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDate();
-    }, msUntilNextDate);
-
-    return () => clearInterval(interval);
-  }, [msUntilNextDate, setCurrentDate]);
 
   // Calc UI States
   const calcViewWeekAmount = () => {

@@ -55,8 +55,6 @@ const DayView = () => {
 
   const currentDate = useDataStore((state) => state.currentDate);
   const viewDate = useDataStore((state) => state.viewDate);
-  const setCurrentDate = useDataStore((state) => state.setCurrentDate);
-  const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
 
   // Tip Data
   const tips = api.tip.findAll.useQuery();
@@ -107,15 +105,7 @@ const DayView = () => {
       : createTip.mutate(validatedValues);
   };
 
-  // Keep Current Date Updated
-  useLayoutEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDate();
-    }, msUntilNextDate);
-
-    return () => clearInterval(interval);
-  }, [msUntilNextDate, setCurrentDate]);
-
+  // Keep ViewDatesTip Updated
   useLayoutEffect(() => {
     setViewDatesTip(
       tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
