@@ -16,6 +16,7 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
   const setViewDate = useDataStore((state) => state.setViewDate);
   const viewMonth = useDataStore((state) => state.viewMonth);
   const setViewMonth = useDataStore((state) => state.setViewMonth);
+  const tippedDates = useDataStore((state) => state.tippedDates);
 
   const tips = api.tip.findAll.useQuery();
 
@@ -52,10 +53,7 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
         }}
         modifiers={{
           todaysDate: currentDate,
-          tipped:
-            tips?.data?.map((tip) => {
-              return new Date(tip.date);
-            }) ?? [],
+          tipped: tippedDates,
         }}
         modifiersClassNames={{
           todaysDate: "border-solid border-2 border-foreground",

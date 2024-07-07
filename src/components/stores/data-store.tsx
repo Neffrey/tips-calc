@@ -40,8 +40,8 @@ export interface TimeStoreTypes {
   viewWeek: { from: Date; to: Date };
   setViewWeek: (inputDate: Date) => void;
 
-  tips: Tips | null | undefined;
-  setTips: (data: Tips) => void;
+  tippedDates: Date[];
+  setTippedDates: (data: Tips) => void;
 }
 
 const useDataStore = create<TimeStoreTypes>((set) => ({
@@ -119,8 +119,14 @@ const useDataStore = create<TimeStoreTypes>((set) => ({
     }));
   },
 
-  tips: null,
-  setTips: (data) => set(() => ({ tips: data })),
+  tippedDates: [],
+  setTippedDates: (data) =>
+    set(() => ({
+      tippedDates:
+        data?.map((tip) => {
+          return new Date(tip.date);
+        }) ?? [],
+    })),
 }));
 
 export default useDataStore;

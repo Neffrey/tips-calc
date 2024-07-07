@@ -7,13 +7,13 @@ import { api } from "~/trpc/react";
 
 const TipData = () => {
   const tipData = api.tip.findAll.useQuery();
-  const setTips = useDataStore((state) => state.setTips);
+  const setTippedDates = useDataStore((state) => state.setTippedDates);
 
   useLayoutEffect(() => {
     if (tipData.data) {
-      setTips(tipData.data);
+      setTippedDates(tipData.data);
     }
-  }, [tipData.data, setTips]);
+  }, [tipData.data, setTippedDates]);
   return null;
 };
 
