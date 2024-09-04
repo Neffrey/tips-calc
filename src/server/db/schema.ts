@@ -1,9 +1,11 @@
+//
 import { relations, sql } from "drizzle-orm";
 import {
   date,
   index,
   integer,
   numeric,
+  pgEnum,
   pgTableCreator,
   primaryKey,
   text,
@@ -144,6 +146,12 @@ export const verificationTokens = createTable(
 );
 
 // CONTENT TABLES
+export const REPORT_TYPES_ENUM = pgEnum("popularity", [
+  "WEEK",
+  "MONTH",
+  "YEAR",
+] as const);
+export type ReportType = (typeof REPORT_TYPES_ENUM.enumValues)[number];
 
 export type ProfilePicture = Prettify<
   InferSqlTable<typeof profilePictures> & {
@@ -238,10 +246,62 @@ export const tips = createTable(
   }),
 );
 
-export const tipRelations = relations(tips, ({ one }) => ({
+export const tipRelations = relations(tips, ({ one, many }) => ({
   user: one(users, { fields: [tips.user], references: [users.id] }),
   baseWage: one(baseWages, {
     fields: [tips.baseWage],
     references: [baseWages.amount],
+  }),
+  tipsToReports: many(tipsToReports),
+}));
+
+export type Report = Prettify<InferSqlTable<typeof reports>>;
+export const reports = createTable(
+  "report",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$default(() => nanoid(12)),
+    user: text("user")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    date: date("date", {
+      mode: "date",
+    }).notNull(),
+    total: numeric("total").$type<number>().notNull(),
+    hours: numeric("hours").$type<number>().notNull(),
+    tips: text("tips").$type<string>().notNull(),
+  },
+  (report) => ({
+    reportIdIndex: index("report_id_index").on(report.id),
+    userIndex: index("report_user_index").on(report.user),
+    dateIndex: index("report_date_index").on(report.date),
+  }),
+);
+
+export const reportRelations = relations(reports, ({ one, many }) => ({
+  user: one(users, { fields: [reports.user], references: [users.id] }),
+  tipsToReports: many(tipsToReports),
+}));
+
+export const tipsToReports = createTable(
+  "tipToReport",
+  {
+    tipId: text("tipId").notNull(),
+    reportId: text("reportId").notNull(),
+  },
+  (tipToReport) => ({
+    compoundKey: primaryKey({
+      columns: [tipToReport.tipId, tipToReport.reportId],
+    }),
+  }),
+);
+
+export const tipsToReportsRelations = relations(tipsToReports, ({ one }) => ({
+  tip: one(tips, { fields: [tipsToReports.tipId], references: [tips.id] }),
+  report: one(reports, {
+    fields: [tipsToReports.reportId],
+    references: [reports.id],
   }),
 }));

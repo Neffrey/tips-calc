@@ -9,8 +9,9 @@ import { Button } from "~/components/ui/button";
 // COMPONENTS
 import TipData from "~/app/_components/tip-data";
 import NotLoggedIn from "~/components/not-logged-in";
+// "~/app/_components/not-logged-in";
 
-const WeekPage = () => {
+const YearPage = () => {
   const { data: session } = useSession();
 
   return (
@@ -37,9 +38,11 @@ const WeekPage = () => {
             "friend"
           )}
         </h1>
+
+        <h2 className="w-full text-center text-2xl font-semibold">Year View</h2>
       </ProtectedContent>
     </div>
   );
 };
 
-export default WeekPage;
+export default YearPage;

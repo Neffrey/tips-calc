@@ -1,14 +1,14 @@
 "use client";
 
 //LIBS
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const DayRedirect = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/dashboard/day");
+    router.push("/day");
   }, [router]);
 
   return null;

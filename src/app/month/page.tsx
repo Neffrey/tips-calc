@@ -37,6 +37,10 @@ const WeekPage = () => {
             "friend"
           )}
         </h1>
+
+        <h2 className="w-full text-center text-2xl font-semibold">
+          Month View
+        </h2>
       </ProtectedContent>
     </div>
   );

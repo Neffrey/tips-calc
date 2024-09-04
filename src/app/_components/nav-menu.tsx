@@ -6,10 +6,10 @@ import { getServerAuthSession } from "~/server/auth";
 
 // COMPONENTS
 import ProtectedContent from "~/components/protectedContent";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import LoginBtn from "./login-btn";
 import Items from "./nav-items";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 // TYPES
 import { type UserRole } from "~/server/db/schema";
@@ -22,20 +22,20 @@ export type NavItems = {
 
 // Nav items
 const navItems: NavItems = [
-  { title: "Day", href: "/dashboard/day", authedRoles: ["ADMIN", "USER"] },
+  { title: "Day", href: "/day", authedRoles: ["ADMIN", "USER"] },
   {
     title: "Week",
-    href: "/dashboard/week",
+    href: "/week",
     authedRoles: ["ADMIN", "USER"],
   },
   {
     title: "Month",
-    href: "/dashboard/month",
+    href: "/month",
     authedRoles: ["ADMIN", "USER"],
   },
   {
     title: "Year",
-    href: "/dashboard/year",
+    href: "/year",
     authedRoles: ["ADMIN", "USER"],
   },
   { title: "Users", href: "/users", authedRoles: ["ADMIN"] },
