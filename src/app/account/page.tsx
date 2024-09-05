@@ -2,10 +2,10 @@
 
 // LIBS
 import { signOut } from "next-auth/react";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 
 // UTILS
-import { api } from "~/trpc/react";
+// import { api } from "~/trpc/react";
 
 // COMPONENTS
 import NotLoggedIn from "~/components/not-logged-in";
@@ -17,14 +17,14 @@ import ThemePicker from "./_components/theme-picker";
 
 // COMP
 const AccountPage = () => {
-  const [showCompletedSetting, setShowCompletedSetting] = useState(false);
+  // const [showCompletedSetting, setShowCompletedSetting] = useState(false);
 
-  const editUser = api.user.edit.useMutation();
+  // const editUser = api.user.edit.useMutation();
 
-  const handleShowCompletedSettingChange = () => {
-    editUser.mutate({ showCompletedSetting: !showCompletedSetting });
-    setShowCompletedSetting(!showCompletedSetting);
-  };
+  // const handleShowCompletedSettingChange = () => {
+  //   editUser.mutate({ showCompletedSetting: !showCompletedSetting });
+  //   setShowCompletedSetting(!showCompletedSetting);
+  // };
 
   return (
     <Suspense>
