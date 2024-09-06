@@ -38,6 +38,12 @@ const navItems: NavItems = [
     href: "/year",
     authedRoles: ["ADMIN", "USER"],
   },
+  {
+    title: "Base Wage",
+    href: "/basewage",
+    authedRoles: ["ADMIN", "USER"],
+  },
+
   { title: "Users", href: "/users", authedRoles: ["ADMIN"] },
 ];
 
