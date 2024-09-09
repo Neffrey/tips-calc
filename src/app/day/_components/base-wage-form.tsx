@@ -17,7 +17,6 @@ import {
   FormLabel,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import BaseWageCalendar from "./base-wage-calendar";
 
 // CONSTANTS
 export const baseWageFormSchema = z.object({
@@ -114,9 +113,8 @@ const BaseWageForm = () => {
                   Date Effective
                 </FormLabel>
                 <FormControl>
-                  {/* <div>bwDate input</div> */}
+                  <div>bwDate input</div>
                   {/* <Input id="bwDate" placeholder="0" {...field} /> */}
-                  <BaseWageCalendar />
                 </FormControl>
               </FormItem>
             )}
