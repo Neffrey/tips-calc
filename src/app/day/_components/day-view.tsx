@@ -1,5 +1,5 @@
 // LIBS
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 
 // HELPERS
 import { getDaysDifference } from "~/lib/time-date";
@@ -36,13 +36,13 @@ const DayView = () => {
   const baseWageData = api.baseWages.findAll.useQuery();
 
   // Keep ViewDatesData Updated
-  useLayoutEffect(() => {
+  useEffect(() => {
     setViewDatesTip(
       tipData?.data?.find((data) => data.date.getTime() === viewDate.getTime()),
     );
   }, [viewDatesTip, setViewDatesTip, tipData.data, viewDate]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setViewDatesBaseWage(
       baseWageData?.data?.find(
         (data) => data.date.getTime() === viewDate.getTime(),
@@ -70,6 +70,9 @@ const DayView = () => {
                   day: "numeric",
                 })}
               </h2>
+              <button onClick={() => console.log(tipData?.data)}>
+                Log tipData
+              </button>
               <div className="flex w-full justify-between gap-3">
                 <h3 className="">{getDaysDifference(viewDate, currentDate)}</h3>
 

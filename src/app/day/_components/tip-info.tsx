@@ -52,9 +52,6 @@ const TipInfo = () => {
               : "0"}
           </span>
         </div>
-        <button className="" onClick={() => console.log(viewDatesTip)}>
-          Log ViewDateTip
-        </button>
       </div>
     </div>
   );
