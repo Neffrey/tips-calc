@@ -1,16 +1,25 @@
 // LIBS
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 // UTILS
-import { type Tip } from "~/server/db/schema";
 import { api } from "~/trpc/react";
 
 // COMPONENTS
 import useDataStore from "~/components/stores/data-store";
 import useThemeStore from "~/components/stores/theme-store";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
 
 // CONSTANTS
 export const addTipFormSchema = z.object({
@@ -32,14 +41,12 @@ const TipForm = () => {
   const cashDrawer = useThemeStore((state) => state.cashDrawer);
   const setCashDrawer = useThemeStore((state) => state.setCashDrawer);
 
-  const currentDate = useDataStore((state) => state.currentDate);
   const viewDate = useDataStore((state) => state.viewDate);
+  const viewDatesTip = useDataStore((state) => state.viewDatesTip);
+  const setViewDatesTip = useDataStore((state) => state.setViewDatesTip);
 
   // Tip Data
   const tips = api.tip.findAll.useQuery();
-  const [viewDatesTip, setViewDatesTip] = useState<Tip | undefined | null>(
-    tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
-  );
 
   const createTip = api.tip.create.useMutation({
     onSuccess: () => {
@@ -66,7 +73,7 @@ const TipForm = () => {
       hours: viewDatesTip?.hours.toString() ?? "0",
       cardTip: viewDatesTip?.cardTip.toString() ?? "0",
       cashDrawerStart: viewDatesTip?.cashDrawerStart?.toString() ?? "0",
-      cashDrawerEnd: viewDatesTip?.toString() ?? "0",
+      cashDrawerEnd: viewDatesTip?.cashDrawerEnd?.toString() ?? "0",
     },
   });
 
@@ -89,18 +96,7 @@ const TipForm = () => {
     setViewDatesTip(
       tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
     );
-  }, [viewDatesTip, tips.data, viewDate]);
-
-  // Update UI States
-  useLayoutEffect(
-    () => {
-      setViewDatesTip(
-        tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
-      );
-    },
-    // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip, tips.data, viewDate],
-  );
+  }, [viewDatesTip, tips.data, viewDate, setViewDatesTip]);
 
   // SET FORM VALUES ON DATA CHANGE
   useLayoutEffect(
@@ -144,7 +140,104 @@ const TipForm = () => {
   );
 
   // RETURN COMPONENT
-  return <></>;
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="flex w-full flex-col gap-4 p-6"
+      >
+        <h3 className="text-lg font-bold">
+          {`${viewDatesTip ? "Edit Existing" : "Add"} Tip`}
+        </h3>
+        <div className="flex w-full justify-between gap-3">
+          <FormField
+            control={form.control}
+            name="cardTip"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel className="text-md">$ Tip total</FormLabel>
+                <FormControl>
+                  <Input placeholder="0" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="hours"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="title" className="text-md">
+                  Hours
+                </FormLabel>
+                <FormControl>
+                  <Input id="title" placeholder="0" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* cashDrawer section */}
+        <div className="flex items-center gap-3 pt-1">
+          <Checkbox
+            name="cashDrawerToggle"
+            checked={cashDrawer}
+            onCheckedChange={() => setCashDrawer(!cashDrawer)}
+          />
+          <label
+            htmlFor="cashDrawerToggle"
+            className="cursor-pointer"
+            onClick={() => setCashDrawer(!cashDrawer)}
+          >
+            Cash Drawer
+          </label>
+        </div>
+        {cashDrawer && (
+          <div className="flex w-full justify-between gap-3">
+            <div className="flex w-1/2 justify-between gap-3">
+              <FormField
+                control={form.control}
+                name="cashDrawerStart"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel className="text-md">
+                      $ Cash Drawer Start
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="0" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex w-1/2 justify-between gap-3">
+              <FormField
+                control={form.control}
+                name="cashDrawerEnd"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel className="text-md">$ Cash Drawer End</FormLabel>
+                    <FormControl>
+                      <Input placeholder="0" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* bottom section */}
+        <Button
+          type="submit"
+          className="rounded-xl px-8 py-6 text-xl font-bold"
+        >
+          {`${viewDatesTip ? "Edit" : "Add"} Tip`}
+        </Button>
+      </form>
+    </Form>
+  );
 };
 
 export default TipForm;

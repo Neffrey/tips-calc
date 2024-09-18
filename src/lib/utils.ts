@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { type Tips } from "~/components/stores/data-store";
+import { type BaseWage, type Tip } from "~/server/db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -10,20 +10,20 @@ export function twoDecimals(n: number) {
   return Math.round(n * 100) / 100;
 }
 
-export const tippedIncludesDay = ({
+export const DayHasData = ({
   date,
-  tipData,
+  dateData,
 }: {
   date: Date;
-  tipData: Tips;
+  dateData: Tip[] | BaseWage[] | null | undefined;
 }) => {
-  let isTipped = false;
-  tipData?.every((tip) => {
-    if (tip.date.getTime() === date.getTime()) {
-      isTipped = true;
+  let hasData = false;
+  dateData?.every((data) => {
+    if (data.date.getTime() === date.getTime()) {
+      hasData = true;
       return false;
     }
     return true;
   });
-  return isTipped;
+  return hasData;
 };

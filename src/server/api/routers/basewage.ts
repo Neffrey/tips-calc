@@ -11,6 +11,11 @@ import { createTRPCRouter, userProcedure } from "~/server/api/trpc";
 import { baseWages, tips } from "~/server/db/schema";
 
 export const baseWageRouter = createTRPCRouter({
+  findAll: userProcedure.query(async ({ ctx }) => {
+    return await ctx.db.query.baseWages.findMany({
+      where: eq(baseWages.user, ctx.session.user.id),
+    });
+  }),
   findRecentBeforeDate: userProcedure
     .input(
       z.object({

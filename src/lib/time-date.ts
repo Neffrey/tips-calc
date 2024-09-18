@@ -1,3 +1,5 @@
+export const dayInMs = 1000 * 60 * 60 * 24;
+
 export const stripTime = (input: Date) => {
   return new Date(input.setHours(0, 0, 0, 0));
 };
@@ -71,7 +73,7 @@ export const getMonth = (date: Date): string => {
 
 export const getDaysDifference = (oldDate: Date, newDate = new Date()) => {
   const diff = newDate.getTime() - oldDate.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const days = Math.floor(diff / dayInMs);
   if (days === 0) return "Today";
   if (days > 0) {
     if (days === 1) return "Yesterday";
@@ -86,10 +88,10 @@ export const getDaysDifference = (oldDate: Date, newDate = new Date()) => {
 
 export const getWeekEpochs = (date: Date) => {
   const start = stripTime(date);
-  start.setTime(start.getTime() - start.getDay() * 1000 * 60 * 60 * 24);
+  start.setTime(start.getTime() - start.getDay() * dayInMs);
 
   const end = stripTime(date);
-  end.setTime(end.getTime() + (6 - end.getDay()) * 1000 * 60 * 60 * 24);
+  end.setTime(end.getTime() + (6 - end.getDay()) * dayInMs);
   return { startEpochTime: start.getTime(), endEpochTime: end.getTime() };
 };
 
@@ -117,7 +119,7 @@ export const findViewMonthStart = (date: Date) => {
   const firstOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
   return new Date(
     // firstOfMonth.setTime(
-    firstOfMonth.getTime() - firstOfMonth.getDay() * 1000 * 60 * 60 * 24,
+    firstOfMonth.getTime() - firstOfMonth.getDay() * dayInMs,
     // ),
   );
 };
@@ -125,7 +127,7 @@ export const findViewMonthEnd = (date: Date) => {
   const lastOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
   return new Date(
     // lastOfMonth.setTime(
-    lastOfMonth.getTime() + (6 - lastOfMonth.getDay()) * 1000 * 60 * 60 * 24,
+    lastOfMonth.getTime() + (6 - lastOfMonth.getDay()) * dayInMs,
     // ),
   );
 };

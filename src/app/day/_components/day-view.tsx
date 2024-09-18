@@ -1,104 +1,68 @@
 // LIBS
 import { useLayoutEffect } from "react";
-import {
-  FaCheck,
-  FaDollarSign,
-  FaExclamationCircle,
-  FaRegClock,
-} from "react-icons/fa";
 
 // HELPERS
 import { getDaysDifference } from "~/lib/time-date";
-import { cn, twoDecimals } from "~/lib/utils";
+import { cn } from "~/lib/utils";
+import { api } from "~/trpc/react";
 
 // COMPONENTS
-import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
+import useDataStore from "~/components/stores/data-store";
 import { Separator } from "~/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import BaseWageForm from "./base-wage-form";
+import BaseWageInfo from "./base-wage-info";
+import DataCheckSubtitle from "./data-check-subtitle";
 import DayControlBtns from "./day-control-btns";
+import TipForm from "./tip-form";
+import TipInfo from "./tip-info";
 
 // COMP
 const DayView = () => {
-  // Keep ViewDatesTip Updated
+  // STATE
+  const currentDate = useDataStore((state) => state.currentDate);
+  const viewDate = useDataStore((state) => state.viewDate);
+  const viewDatesTip = useDataStore((state) => state.viewDatesTip);
+  const setViewDatesTip = useDataStore((state) => state.setViewDatesTip);
+  const viewDatesBaseWage = useDataStore((state) => state.viewDatesBaseWage);
+  const setViewDatesBaseWage = useDataStore(
+    (state) => state.setViewDatesBaseWage,
+  );
+  const dayMode = useDataStore((state) => state.dayMode);
+  const setDayMode = useDataStore((state) => state.setDayMode);
+
+  // API
+  const tipData = api.tip.findAll.useQuery();
+  const baseWageData = api.baseWages.findAll.useQuery();
+
+  // Keep ViewDatesData Updated
   useLayoutEffect(() => {
     setViewDatesTip(
-      tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
+      tipData?.data?.find((data) => data.date.getTime() === viewDate.getTime()),
     );
-  }, [viewDatesTip, tips.data, viewDate]);
+  }, [viewDatesTip, setViewDatesTip, tipData.data, viewDate]);
 
-  // Update UI States
-  useLayoutEffect(
-    () => {
-      setViewDatesTip(
-        tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
-      );
-    },
-    // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip, tips.data, viewDate],
-  );
-
-  // SET FORM VALUES ON DATA CHANGE
-  useLayoutEffect(
-    () => {
-      if (!viewDatesTip) {
-        form.setValue("cardTip", "0");
-        form.setValue("hours", "0");
-        form.setValue("cashDrawerStart", "0");
-        form.setValue("cashDrawerEnd", "0");
-      }
-      if (viewDatesTip) {
-        form.setValue("cardTip", viewDatesTip.cardTip.toString());
-        form.setValue("hours", viewDatesTip.hours.toString());
-        if (viewDatesTip.cashDrawerStart) {
-          form.setValue(
-            "cashDrawerStart",
-            viewDatesTip.cashDrawerStart.toString(),
-          );
-        } else {
-          form.setValue("cashDrawerStart", "0");
-        }
-        if (viewDatesTip.cashDrawerEnd) {
-          form.setValue("cashDrawerEnd", viewDatesTip.cashDrawerEnd.toString());
-        }
-        // Show cash drawer if either start or end is not 0
-        if (
-          (viewDatesTip.cashDrawerStart &&
-            viewDatesTip.cashDrawerStart !== 0) ??
-          (viewDatesTip.cashDrawerEnd && viewDatesTip.cashDrawerEnd !== 0)
-          // TODO: Keep open if profile default is cashDrawerOpen
-        ) {
-          setCashDrawer(true);
-        } else {
-          setCashDrawer(false);
-        }
-      }
-    },
-
-    // eslint-disable-next-line -- only want dependency on data
-    [viewDatesTip, viewDate],
-  );
+  useLayoutEffect(() => {
+    setViewDatesBaseWage(
+      baseWageData?.data?.find(
+        (data) => data.date.getTime() === viewDate.getTime(),
+      ),
+    );
+  }, [viewDatesTip, setViewDatesBaseWage, baseWageData.data, viewDate]);
 
   // RETURN COMPONENT
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex w-2/5 flex-col gap-4">
       {
         <div className="flex w-full flex-col items-center justify-between gap-2 rounded-lg bg-card px-4 py-3">
           <DayControlBtns />
           <div
             className={cn(
-              "flex flex-wrap justify-between gap-3 rounded-lg bg-popover px-6 py-5 text-popover-foreground",
+              "flex w-full flex-wrap justify-between gap-3 rounded-lg bg-popover px-6 py-5 text-popover-foreground",
               viewDatesTip ? "" : "cursor-not-allowed",
             )}
           >
-            <div className="flex flex-col">
+            <div className="flex w-full flex-col">
               <h2 className="text-xl font-bold">
                 {viewDate.toLocaleDateString(undefined, {
                   weekday: "short",
@@ -106,150 +70,47 @@ const DayView = () => {
                   day: "numeric",
                 })}
               </h2>
-              <h3 className="">{getDaysDifference(viewDate, currentDate)}</h3>
-            </div>
-            <div className="flex items-center">
-              {viewDatesTip ? "Tip Entered" : "No Tip Data"}
-              <div className="pl-3" />
-              {viewDatesTip ? (
-                <FaCheck className="text-primary" />
-              ) : (
-                <FaExclamationCircle className="text-accent" />
-              )}
-            </div>
-            <div
-              className={cn(
-                "flex w-full",
-                viewDatesTip
-                  ? "text-popover-foreground"
-                  : "text-popover-foreground/40",
-              )}
-            >
-              <div className="flex w-full items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <FaDollarSign />
-                  <span>
-                    {twoDecimals(viewDatesTip?.total ?? 0).toString()}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <FaRegClock />
-                  <span>
-                    {twoDecimals(viewDatesTip?.hours ?? 0).toString()}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span>$ per H</span>
-                  <span>
-                    {twoDecimals(viewDatesTip?.perHour ?? 0).toString()}
-                  </span>
-                </div>
+              <div className="flex w-full justify-between gap-3">
+                <h3 className="">{getDaysDifference(viewDate, currentDate)}</h3>
+
+                <DataCheckSubtitle />
               </div>
+              {dayMode === "tip" ? <TipInfo /> : <BaseWageInfo />}
             </div>
           </div>
 
-          <div className="pt-4" />
+          <div className="pt-2" />
           <Separator className="w-4/5 bg-card-foreground/30" />
+          <div className="pt-2" />
 
           {/* Form Section */}
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="flex w-full flex-col gap-4 p-6"
-            >
-              <h3 className="text-lg font-bold">
-                {`${viewDatesTip ? "Edit Existing" : "Add"} Tip`}
-              </h3>
-              <div className="flex w-full justify-between gap-3">
-                <FormField
-                  control={form.control}
-                  name="cardTip"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel className="text-md">$ Tip total</FormLabel>
-                      <FormControl>
-                        <Input placeholder="0" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="hours"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="title" className="text-md">
-                        Hours
-                      </FormLabel>
-                      <FormControl>
-                        <Input id="title" placeholder="0" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* cashDrawer section */}
-              <div className="flex items-center gap-3 pt-1">
-                <Checkbox
-                  name="cashDrawerToggle"
-                  checked={cashDrawer}
-                  onCheckedChange={() => setCashDrawer(!cashDrawer)}
-                />
-                <label
-                  htmlFor="cashDrawerToggle"
-                  className="cursor-pointer"
-                  onClick={() => setCashDrawer(!cashDrawer)}
-                >
-                  Cash Drawer
-                </label>
-              </div>
-              {cashDrawer && (
-                <div className="flex w-full justify-between gap-3">
-                  <div className="flex w-1/2 justify-between gap-3">
-                    <FormField
-                      control={form.control}
-                      name="cashDrawerStart"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-md">
-                            $ Cash Drawer Start
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="0" {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="flex w-1/2 justify-between gap-3">
-                    <FormField
-                      control={form.control}
-                      name="cashDrawerEnd"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-md">
-                            $ Cash Drawer End
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="0" {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* bottom section */}
-              <Button
-                type="submit"
-                className="rounded-xl px-8 py-6 text-xl font-bold"
+          <Tabs
+            className="w-full rounded-lg bg-popover p-3 text-popover-foreground"
+            value={dayMode}
+          >
+            <TabsList className="flex justify-center">
+              <TabsTrigger
+                className="w-full"
+                value="tip"
+                onClick={() => setDayMode("tip")}
               >
-                {`${viewDatesTip ? "Edit" : "Add"} Tip`}
-              </Button>
-            </form>
-          </Form>
+                Tips Mode
+              </TabsTrigger>
+              <TabsTrigger
+                className="w-full"
+                value="basewage"
+                onClick={() => setDayMode("basewage")}
+              >
+                Base Wage Mode
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="tip">
+              <TipForm />
+            </TabsContent>
+            <TabsContent value="basewage">
+              <BaseWageForm />
+            </TabsContent>
+          </Tabs>
         </div>
       }
     </div>

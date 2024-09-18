@@ -1,22 +1,12 @@
 // LIBS
 import { useLayoutEffect } from "react";
 
-// HELPERS
+// UTILS
 import useDataStore from "~/components/stores/data-store";
-import { api } from "~/trpc/react";
 
-const TipData = () => {
-  const tipData = api.tip.findAll.useQuery();
-  const setTippedDates = useDataStore((state) => state.setTippedDates);
+const CurrentDateSync = () => {
   const setCurrentDate = useDataStore((state) => state.setCurrentDate);
   const msUntilNextDate = useDataStore((state) => state.msUntilNextDate);
-
-  // Keep Tipped Dates Updated
-  useLayoutEffect(() => {
-    if (tipData.data) {
-      setTippedDates(tipData.data);
-    }
-  }, [tipData.data, setTippedDates]);
 
   // Keep Current Date Updated
   useLayoutEffect(() => {
@@ -30,4 +20,4 @@ const TipData = () => {
   return null;
 };
 
-export default TipData;
+export default CurrentDateSync;

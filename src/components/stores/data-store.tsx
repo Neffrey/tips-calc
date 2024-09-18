@@ -5,17 +5,18 @@ import { create } from "zustand";
 
 // UTILS
 import {
+  dayInMs,
   msUntilNextDate,
   msUntilNextMinute,
   msUntilNextSecond,
   stripTime,
 } from "~/lib/time-date";
-import { type Tip } from "~/server/db/schema";
+import { type BaseWage, type Tip } from "~/server/db/schema";
 
 // TYPES
-export type Tips = Tip[] | null | undefined;
+export type DayMode = "tip" | "basewage";
 
-export interface TimeStoreTypes {
+export interface DataStoreTypes {
   currentTime: Date;
   setCurrentTime: () => void;
 
@@ -40,11 +41,23 @@ export interface TimeStoreTypes {
   viewWeek: { from: Date; to: Date };
   setViewWeek: (inputDate: Date) => void;
 
-  tippedDates: Date[];
-  setTippedDates: (data: Tips) => void;
+  viewDatesTip: Tip | undefined | null;
+  setViewDatesTip: (data: Tip | undefined | null) => void;
+
+  viewDatesBaseWage: BaseWage | undefined | null;
+  setViewDatesBaseWage: (data: BaseWage | undefined | null) => void;
+
+  datesWithTip: Date[];
+  setDatesWithTip: (data: Tip[]) => void;
+
+  datesWithBaseWage: Date[];
+  setDatesWithBaseWage: (data: BaseWage[]) => void;
+
+  dayMode: DayMode;
+  setDayMode: (mode: DayMode) => void;
 }
 
-const useDataStore = create<TimeStoreTypes>((set) => ({
+const useDataStore = create<DataStoreTypes>((set) => ({
   currentTime: new Date(),
   setCurrentTime: () => {
     set(() => ({
@@ -97,11 +110,11 @@ const useDataStore = create<TimeStoreTypes>((set) => ({
   viewWeek: {
     from: new Date(
       stripTime(new Date()).getTime() -
-        stripTime(new Date()).getDay() * 24 * 60 * 60 * 1000,
+        stripTime(new Date()).getDay() * dayInMs,
     ),
     to: new Date(
       stripTime(new Date()).getTime() +
-        (6 - stripTime(new Date()).getDay()) * 24 * 60 * 60 * 1000,
+        (6 - stripTime(new Date()).getDay()) * dayInMs,
     ),
   },
   setViewWeek: (inputDate: Date) => {
@@ -109,24 +122,42 @@ const useDataStore = create<TimeStoreTypes>((set) => ({
       viewWeek: {
         from: new Date(
           stripTime(inputDate).getTime() -
-            stripTime(inputDate).getDay() * 24 * 60 * 60 * 1000,
+            stripTime(inputDate).getDay() * dayInMs,
         ),
         to: new Date(
           stripTime(inputDate).getTime() +
-            (6 - stripTime(inputDate).getDay()) * 24 * 60 * 60 * 1000,
+            (6 - stripTime(inputDate).getDay()) * dayInMs,
         ),
       },
     }));
   },
 
-  tippedDates: [],
-  setTippedDates: (data) =>
+  viewDatesTip: null,
+  setViewDatesTip: (data) => set(() => ({ viewDatesTip: data })),
+
+  viewDatesBaseWage: null,
+  setViewDatesBaseWage: (data) => set(() => ({ viewDatesBaseWage: data })),
+
+  datesWithTip: [],
+  setDatesWithTip: (data) =>
     set(() => ({
-      tippedDates:
-        data?.map((tip) => {
-          return new Date(tip.date);
+      datesWithTip:
+        data?.map((data) => {
+          return new Date(data.date);
         }) ?? [],
     })),
+
+  datesWithBaseWage: [],
+  setDatesWithBaseWage: (data) =>
+    set(() => ({
+      datesWithBaseWage:
+        data?.map((data) => {
+          return new Date(data.date);
+        }) ?? [],
+    })),
+
+  dayMode: "tip",
+  setDayMode: (mode) => set(() => ({ dayMode: mode })),
 }));
 
 export default useDataStore;

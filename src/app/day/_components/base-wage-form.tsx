@@ -1,11 +1,12 @@
 // LIBS
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
 // UTILS
-import { type BaseWage } from "~/server/db/schema";
+import useDataStore from "~/components/stores/data-store";
+import { api } from "~/trpc/react";
 
 // COMPONENTS
 import { Button } from "~/components/ui/button";
@@ -20,68 +21,96 @@ import { Input } from "~/components/ui/input";
 
 // CONSTANTS
 export const baseWageFormSchema = z.object({
-  id: z.string().nullable(),
-  amount: z
-    .number({ message: "Base hourly wage must be a positive number" })
-    .positive()
-    .transform((val) => val.toString()),
-  date: z
-    .number()
-    .int()
-    .refine((val) => val >= 0, { message: "Date must be a valid date" })
-    .transform((val) => val.toString()), // Date in epoch
+  amount: z.string().refine((val) => !Number.isNaN(Number(val)), {
+    message: "Hourly base wage must be a positive number",
+  }),
 });
 
 // COMP
 const BaseWageForm = () => {
   // STATE
-  const [currentBaseWage, setCurrentBaseWage] = useState<BaseWage | undefined>(
-    undefined,
+  const viewDate = useDataStore((state) => state.viewDate);
+  const viewDatesBaseWage = useDataStore((state) => state.viewDatesBaseWage);
+  const setViewDatesBaseWage = useDataStore(
+    (state) => state.setViewDatesBaseWage,
   );
+
   // API
-  //   const tips = api.tip.findAll.useQuery();
-  //   const [viewDatesTip, setViewDatesTip] = useState<Tip | undefined | null>(
-  //     tips?.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
-  //   );
+  const baseWageData = api.baseWages.findAll.useQuery();
 
-  //   const createTip = api.tip.create.useMutation({
-  //     onSuccess: () => {
-  //       void tips.refetch();
-  //       setViewDatesTip(
-  //         tips.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
-  //       );
-  //     },
-  //   });
+  const createBaseWage = api.baseWages.create.useMutation({
+    onSuccess: () => {
+      void baseWageData.refetch();
+      setViewDatesBaseWage(
+        baseWageData.data?.find(
+          (data) => data.date.getTime() === viewDate.getTime(),
+        ),
+      );
+    },
+  });
 
-  //   const editTip = api.tip.edit.useMutation({
-  //     onSuccess: () => {
-  //       void tips.refetch();
-  //       setViewDatesTip(
-  //         tips.data?.find((tip) => tip.date.getTime() === viewDate.getTime()),
-  //       );
-  //     },
-  //   });
+  const editBaseWage = api.baseWages.edit.useMutation({
+    onSuccess: () => {
+      void baseWageData.refetch();
+      setViewDatesBaseWage(
+        baseWageData.data?.find(
+          (data) => data.date.getTime() === viewDate.getTime(),
+        ),
+      );
+    },
+  });
 
   // FORM
   const form = useForm<z.infer<typeof baseWageFormSchema>>({
     resolver: zodResolver(baseWageFormSchema),
     defaultValues: {
-      id: currentBaseWage?.id ?? null,
-      amount: currentBaseWage?.amount.toString() ?? "0",
-      date: currentBaseWage?.date.toString() ?? new Date().getTime().toString(),
+      amount: viewDatesBaseWage?.amount.toString() ?? "0",
     },
   });
 
   const handleSubmit = (values: z.infer<typeof baseWageFormSchema>) => {
     const validatedValues = {
-      id: values.id,
       amount: values.amount,
-      date: values.date,
     };
-    //     viewDatesTip
-    //       ? editTip.mutate(validatedValues)
-    //       : createTip.mutate(validatedValues);
+    if (!viewDatesBaseWage) {
+      createBaseWage.mutate({
+        date: viewDate,
+        amount: Number(validatedValues?.amount),
+      });
+    }
+    if (viewDatesBaseWage)
+      editBaseWage.mutate({
+        id: viewDatesBaseWage.id,
+        date: viewDatesBaseWage.date,
+        amount: Number(validatedValues?.amount),
+      });
   };
+
+  // Keep ViewDatesBaseWage Updated
+  useLayoutEffect(() => {
+    setViewDatesBaseWage(
+      baseWageData?.data?.find(
+        (data) => data.date.getTime() === viewDate.getTime(),
+      ),
+    );
+  }, [viewDatesBaseWage, baseWageData.data, viewDate, setViewDatesBaseWage]);
+
+  // SET FORM VALUES ON DATA CHANGE
+  useLayoutEffect(
+    () => {
+      if (!viewDatesBaseWage) {
+        form.setValue("amount", "0");
+      }
+      if (viewDatesBaseWage) {
+        form.setValue("amount", viewDatesBaseWage.amount.toString());
+      }
+    },
+
+    // eslint-disable-next-line -- only want dependency on data
+    [viewDatesBaseWage, viewDate],
+  );
+
+  // JSX
   return (
     <Form {...form}>
       <form
@@ -89,7 +118,7 @@ const BaseWageForm = () => {
         className="flex w-full flex-col gap-4 p-6"
       >
         <h3 className="text-lg font-bold">
-          {`${currentBaseWage ? "Edit Existing" : "Add"} Base Wage`}
+          {`${viewDatesBaseWage ? "Edit Existing" : "Add"} Base Wage`}
         </h3>
         <div className="flex w-full justify-between gap-3">
           <FormField
@@ -104,21 +133,6 @@ const BaseWageForm = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="bwDate" className="text-md">
-                  Date Effective
-                </FormLabel>
-                <FormControl>
-                  <div>bwDate input</div>
-                  {/* <Input id="bwDate" placeholder="0" {...field} /> */}
-                </FormControl>
-              </FormItem>
-            )}
-          />
         </div>
 
         {/* bottom section */}
@@ -126,7 +140,7 @@ const BaseWageForm = () => {
           type="submit"
           className="rounded-xl px-8 py-6 text-xl font-bold"
         >
-          {`${currentBaseWage ? "Edit" : "Add"} Base Wage`}
+          {`${viewDatesBaseWage ? "Edit" : "Add"} Base Wage`}
         </Button>
       </form>
     </Form>
