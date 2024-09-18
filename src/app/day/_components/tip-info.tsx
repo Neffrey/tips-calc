@@ -1,12 +1,29 @@
 // LIBS
+import { useLayoutEffect } from "react";
 import { FaDollarSign, FaRegClock } from "react-icons/fa";
 
 // UTILS
 import useDataStore from "~/components/stores/data-store";
 import { cn } from "~/lib/utils";
+import { api } from "~/trpc/react";
 
 const TipInfo = () => {
+  const viewDate = useDataStore((state) => state.viewDate);
   const viewDatesTip = useDataStore((state) => state.viewDatesTip);
+  const setViewDatesTip = useDataStore((state) => state.setViewDatesTip);
+  const tipData = api.tip.findSingle.useQuery({
+    date: viewDate,
+  });
+
+  useLayoutEffect(() => {
+    if (viewDatesTip) {
+      document.body.style.cursor = "pointer";
+    }
+    return () => {
+      document.body.style.cursor = "default";
+    };
+  }, [viewDatesTip]);
+
   return (
     <div
       className={cn(
@@ -35,6 +52,9 @@ const TipInfo = () => {
               : "0"}
           </span>
         </div>
+        <button className="" onClick={() => console.log(viewDatesTip)}>
+          Log ViewDateTip
+        </button>
       </div>
     </div>
   );
