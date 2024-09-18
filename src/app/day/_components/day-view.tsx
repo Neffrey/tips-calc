@@ -1,5 +1,5 @@
 // LIBS
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 // HELPERS
 import { getDaysDifference } from "~/lib/time-date";
@@ -36,19 +36,37 @@ const DayView = () => {
   const baseWageData = api.baseWages.findAll.useQuery();
 
   // Keep ViewDatesData Updated
-  useEffect(() => {
-    setViewDatesTip(
-      tipData?.data?.find((data) => data.date.getTime() === viewDate.getTime()),
-    );
-  }, [viewDatesTip, setViewDatesTip, tipData.data, viewDate]);
+  useLayoutEffect(() => {
+    if (dayMode === "tip") {
+      setViewDatesTip(
+        tipData?.data?.find(
+          (data) => data.date.getTime() === viewDate.getTime(),
+        ),
+      );
+    }
+    if (dayMode === "basewage") {
+      setViewDatesBaseWage(
+        baseWageData?.data?.find(
+          (data) => data.date.getTime() === viewDate.getTime(),
+        ),
+      );
+    }
+  }, [
+    tipData?.data,
+    baseWageData?.data,
+    viewDate,
+    setViewDatesTip,
+    setViewDatesBaseWage,
+    dayMode,
+  ]);
 
-  useEffect(() => {
-    setViewDatesBaseWage(
-      baseWageData?.data?.find(
-        (data) => data.date.getTime() === viewDate.getTime(),
-      ),
-    );
-  }, [viewDatesTip, setViewDatesBaseWage, baseWageData.data, viewDate]);
+  // useLayoutEffect(() => {
+  //   setViewDatesBaseWage(
+  //     baseWageData?.data?.find(
+  //       (data) => data.date.getTime() === viewDate.getTime(),
+  //     ),
+  //   );
+  // }, [viewDatesTip, setViewDatesBaseWage, baseWageData.data, viewDate]);
 
   // RETURN COMPONENT
   return (
@@ -70,7 +88,15 @@ const DayView = () => {
                   day: "numeric",
                 })}
               </h2>
-              <button onClick={() => console.log(tipData?.data)}>
+              <button
+                onClick={() =>
+                  console.log(
+                    tipData?.data?.find(
+                      (data) => data.date.getTime() === viewDate.getTime(),
+                    ),
+                  )
+                }
+              >
                 Log tipData
               </button>
               <div className="flex w-full justify-between gap-3">
