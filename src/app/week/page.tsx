@@ -5,7 +5,6 @@
 // UTILS
 
 // COMPONENTS
-import TipData from "~/app/_components/tip-data";
 import NotLoggedIn from "~/components/not-logged-in";
 import ProtectedContent from "~/components/protectedContent";
 import WeekCalender from "./_components/week-calendar";
@@ -35,7 +34,6 @@ const WeekPage = () => {
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<NotLoggedIn />}
       >
-        <TipData />
         <h1 className="center w-full text-center text-3xl font-bold uppercase tracking-widest">
           Week Tracker
         </h1>

@@ -7,7 +7,6 @@ import ProtectedContent from "~/components/protectedContent";
 import { Button } from "~/components/ui/button";
 
 // COMPONENTS
-import TipData from "~/app/_components/tip-data";
 import NotLoggedIn from "~/components/not-logged-in";
 // "~/app/_components/not-logged-in";
 
@@ -19,7 +18,6 @@ const YearPage = () => {
       // HERO ROW
       className="flex w-full flex-wrap justify-around gap-12 bg-gradient-to-br from-background to-background/50 py-12 md:justify-center"
     >
-      <TipData />
       <ProtectedContent
         authedRoles={["ADMIN", "USER", "RESTRICTED"]}
         fallback={<NotLoggedIn />}
