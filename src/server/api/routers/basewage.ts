@@ -138,7 +138,8 @@ export const baseWageRouter = createTRPCRouter({
       // Update Existing Tips
       await Promise.all(
         tipData.map(async (tip) => {
-          if (!tip ?? tip.baseWage === input.amount) return;
+          if (!tip) return;
+          if (tip.baseWage === input.amount) return;
 
           const tipTotal =
             tip.cardTip +
