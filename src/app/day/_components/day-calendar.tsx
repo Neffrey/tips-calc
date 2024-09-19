@@ -19,7 +19,7 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
   const dayMode = useDataStore((state) => state.dayMode);
 
   const tipData = api.tip.findAll.useQuery();
-  const baseWageData = api.baseWages.findAll.useQuery();
+  const baseWageData = api.baseWage.findAll.useQuery();
 
   // Get Dates With Data depending on dayMode
   const datesWithData = () => {

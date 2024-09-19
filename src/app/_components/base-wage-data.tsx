@@ -6,7 +6,7 @@ import useDataStore from "~/components/stores/data-store";
 import { api } from "~/trpc/react";
 
 const BaseWageData = () => {
-  const baseWageData = api.baseWages.findAll.useQuery();
+  const baseWageData = api.baseWage.findAll.useQuery();
   const setDatesWithBaseWage = useDataStore(
     (state) => state.setDatesWithBaseWage,
   );

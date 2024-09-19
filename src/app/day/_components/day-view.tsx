@@ -24,7 +24,7 @@ const DayView = () => {
   const viewDate = useDataStore((state) => state.viewDate);
   const viewDatesTip = useDataStore((state) => state.viewDatesTip);
   const setViewDatesTip = useDataStore((state) => state.setViewDatesTip);
-  const viewDatesBaseWage = useDataStore((state) => state.viewDatesBaseWage);
+  // const viewDatesBaseWage = useDataStore((state) => state.viewDatesBaseWage);
   const setViewDatesBaseWage = useDataStore(
     (state) => state.setViewDatesBaseWage,
   );
@@ -33,7 +33,7 @@ const DayView = () => {
 
   // API
   const tipData = api.tip.findAll.useQuery();
-  const baseWageData = api.baseWages.findAll.useQuery();
+  const baseWageData = api.baseWage.findAll.useQuery();
 
   // Keep ViewDatesData Updated
   useLayoutEffect(() => {

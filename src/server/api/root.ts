@@ -14,7 +14,7 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   tip: tipRouter,
   profilePicture: profilePictureRouter,
-  baseWages: baseWageRouter,
+  baseWage: baseWageRouter,
 });
 
 // export type definition of API
