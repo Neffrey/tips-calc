@@ -19,16 +19,16 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
   const dayMode = useDataStore((state) => state.dayMode);
 
   const tipData = api.tip.findAll.useQuery();
-  const baseWageData = api.baseWage.findAll.useQuery();
+  // const baseWageData = api.baseWage.findAll.useQuery();
 
   // Get Dates With Data depending on dayMode
   const datesWithData = () => {
     if (dayMode === "tip" && tipData.data) {
       return tipData.data.map((data) => data.date);
     }
-    if (dayMode === "basewage" && baseWageData.data) {
-      return baseWageData.data.map((data) => data.date);
-    }
+    // if (dayMode === "basewage" && baseWageData.data) {
+    //   return baseWageData.data.map((data) => data.date);
+    // }
     return [];
   };
 
@@ -50,8 +50,8 @@ const DayCalender = ({ className = "" }: { className?: string }) => {
     switch (dayMode) {
       case "tip":
         return tipData?.data;
-      case "basewage":
-        return baseWageData?.data;
+      // case "basewage":
+      //   return baseWageData?.data;
       default:
         return null;
     }

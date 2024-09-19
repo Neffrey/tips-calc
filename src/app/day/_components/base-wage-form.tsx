@@ -6,7 +6,7 @@ import z from "zod";
 
 // UTILS
 import useDataStore from "~/components/stores/data-store";
-import { api } from "~/trpc/react";
+// import { api } from "~/trpc/react";
 
 // COMPONENTS
 import { Button } from "~/components/ui/button";
@@ -36,7 +36,7 @@ const BaseWageForm = () => {
   );
 
   // API
-  const baseWageData = api.baseWage.findAll.useQuery();
+  // const baseWageData = api.baseWage.findAll.useQuery();
 
   // const createBaseWage = api.baseWage.create.useMutation({
   //   onSuccess: () => {
@@ -87,13 +87,13 @@ const BaseWageForm = () => {
   };
 
   // Keep ViewDatesBaseWage Updated
-  useLayoutEffect(() => {
-    setViewDatesBaseWage(
-      baseWageData?.data?.find(
-        (data) => data.date.getTime() === viewDate.getTime(),
-      ),
-    );
-  }, [viewDatesBaseWage, baseWageData.data, viewDate, setViewDatesBaseWage]);
+  // useLayoutEffect(() => {
+  //   setViewDatesBaseWage(
+  //     baseWageData?.data?.find(
+  //       (data) => data.date.getTime() === viewDate.getTime(),
+  //     ),
+  //   );
+  // }, [viewDatesBaseWage, baseWageData.data, viewDate, setViewDatesBaseWage]);
 
   // SET FORM VALUES ON DATA CHANGE
   useLayoutEffect(
