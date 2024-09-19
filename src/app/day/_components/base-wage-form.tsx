@@ -6,7 +6,7 @@ import z from "zod";
 
 // UTILS
 import useDataStore from "~/components/stores/data-store";
-// import { api } from "~/trpc/react";
+import { api } from "~/trpc/react";
 
 // COMPONENTS
 import { Button } from "~/components/ui/button";
@@ -36,29 +36,29 @@ const BaseWageForm = () => {
   );
 
   // API
-  // const baseWageData = api.baseWage.findAll.useQuery();
+  const baseWageData = api.baseWage.findAll.useQuery();
 
-  // const createBaseWage = api.baseWage.create.useMutation({
-  //   onSuccess: () => {
-  //     void baseWageData.refetch();
-  //     setViewDatesBaseWage(
-  //       baseWageData.data?.find(
-  //         (data) => data.date.getTime() === viewDate.getTime(),
-  //       ),
-  //     );
-  //   },
-  // });
+  const createBaseWage = api.baseWage.create.useMutation({
+    onSuccess: () => {
+      void baseWageData.refetch();
+      setViewDatesBaseWage(
+        baseWageData.data?.find(
+          (data) => data.date.getTime() === viewDate.getTime(),
+        ),
+      );
+    },
+  });
 
-  // const editBaseWage = api.baseWage.edit.useMutation({
-  //   onSuccess: () => {
-  //     void baseWageData.refetch();
-  //     setViewDatesBaseWage(
-  //       baseWageData.data?.find(
-  //         (data) => data.date.getTime() === viewDate.getTime(),
-  //       ),
-  //     );
-  //   },
-  // });
+  const editBaseWage = api.baseWage.edit.useMutation({
+    onSuccess: () => {
+      void baseWageData.refetch();
+      setViewDatesBaseWage(
+        baseWageData.data?.find(
+          (data) => data.date.getTime() === viewDate.getTime(),
+        ),
+      );
+    },
+  });
 
   // FORM
   const form = useForm<z.infer<typeof baseWageFormSchema>>({
@@ -72,28 +72,28 @@ const BaseWageForm = () => {
     const validatedValues = {
       amount: values.amount,
     };
-    // if (!viewDatesBaseWage) {
-    // createBaseWage.mutate({
-    //   date: viewDate,
-    //   amount: Number(validatedValues?.amount),
-    // });
-    // }
-    // if (viewDatesBaseWage)
-    //   editBaseWage.mutate({
-    //     id: viewDatesBaseWage.id,
-    //     date: viewDatesBaseWage.date,
-    //     amount: Number(validatedValues?.amount),
-    //   });
+    if (!viewDatesBaseWage) {
+      createBaseWage.mutate({
+        date: viewDate,
+        amount: Number(validatedValues?.amount),
+      });
+    }
+    if (viewDatesBaseWage)
+      editBaseWage.mutate({
+        id: viewDatesBaseWage.id,
+        date: viewDatesBaseWage.date,
+        amount: Number(validatedValues?.amount),
+      });
   };
 
   // Keep ViewDatesBaseWage Updated
-  // useLayoutEffect(() => {
-  //   setViewDatesBaseWage(
-  //     baseWageData?.data?.find(
-  //       (data) => data.date.getTime() === viewDate.getTime(),
-  //     ),
-  //   );
-  // }, [viewDatesBaseWage, baseWageData.data, viewDate, setViewDatesBaseWage]);
+  useLayoutEffect(() => {
+    setViewDatesBaseWage(
+      baseWageData?.data?.find(
+        (data) => data.date.getTime() === viewDate.getTime(),
+      ),
+    );
+  }, [viewDatesBaseWage, baseWageData.data, viewDate, setViewDatesBaseWage]);
 
   // SET FORM VALUES ON DATA CHANGE
   useLayoutEffect(

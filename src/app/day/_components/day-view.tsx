@@ -33,7 +33,7 @@ const DayView = () => {
 
   // API
   const tipData = api.tip.findAll.useQuery();
-  // const baseWageData = api.baseWage.findAll.useQuery();
+  const baseWageData = api.baseWage.findAll.useQuery();
 
   // Keep ViewDatesData Updated
   useLayoutEffect(() => {
@@ -44,29 +44,29 @@ const DayView = () => {
         ),
       );
     }
-    // if (dayMode === "basewage") {
-    //   setViewDatesBaseWage(
-    //     baseWageData?.data?.find(
-    //       (data) => data.date.getTime() === viewDate.getTime(),
-    //     ),
-    //   );
-    // }
+    if (dayMode === "basewage") {
+      setViewDatesBaseWage(
+        baseWageData?.data?.find(
+          (data) => data.date.getTime() === viewDate.getTime(),
+        ),
+      );
+    }
   }, [
     tipData?.data,
-    // baseWageData?.data,
+    baseWageData?.data,
     viewDate,
     setViewDatesTip,
     setViewDatesBaseWage,
     dayMode,
   ]);
 
-  // useLayoutEffect(() => {
-  //   setViewDatesBaseWage(
-  //     baseWageData?.data?.find(
-  //       (data) => data.date.getTime() === viewDate.getTime(),
-  //     ),
-  //   );
-  // }, [viewDatesTip, setViewDatesBaseWage, baseWageData.data, viewDate]);
+  useLayoutEffect(() => {
+    setViewDatesBaseWage(
+      baseWageData?.data?.find(
+        (data) => data.date.getTime() === viewDate.getTime(),
+      ),
+    );
+  }, [viewDatesTip, setViewDatesBaseWage, baseWageData.data, viewDate]);
 
   // RETURN COMPONENT
   return (

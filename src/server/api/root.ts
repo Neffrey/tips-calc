@@ -1,4 +1,5 @@
 // import { postRouter } from "~/server/api/routers/post";
+import { baseWageRouter } from "~/server/api/routers/base-wage";
 import { profilePictureRouter } from "~/server/api/routers/profile-picture";
 import { tipRouter } from "~/server/api/routers/tip";
 import { userRouter } from "~/server/api/routers/user";
@@ -13,7 +14,7 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   tip: tipRouter,
   profilePicture: profilePictureRouter,
-  // baseWage: baseWageRouter,
+  baseWage: baseWageRouter,
 });
 
 // export type definition of API
